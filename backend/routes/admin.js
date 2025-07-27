@@ -9,8 +9,16 @@ const {
   updateProduct,
   updateProductStock,
   getAllCustomers,
-  getSalesAnalytics
+  getSalesAnalytics,
+  getAllEvents,
+  getEvent,
+  updateEvent,
+  deleteEvent
 } = require('../controllers/adminController');
+
+const {
+  createEvent
+} = require('../controllers/eventController');
 
 const { protect, authorize } = require('../middleware/auth');
 const { 
@@ -41,10 +49,20 @@ router.put('/orders/:id/assign-driver', validateMongoId, handleValidationErrors,
 // Product management
 router.route('/products')
   .get(validatePagination, handleValidationErrors, getAllProducts)
-  .post(validateProduct, handleValidationErrors, createProduct);
+  .post(createProduct);
 
-router.put('/products/:id', validateMongoId, validateProduct, handleValidationErrors, updateProduct);
+router.put('/products/:id', validateMongoId, handleValidationErrors, updateProduct);
 router.put('/products/:id/stock', validateMongoId, handleValidationErrors, updateProductStock);
+
+// Event management
+router.route('/events')
+  .get(getAllEvents)
+  .post(createEvent);
+
+router.route('/events/:id')
+  .get(validateMongoId, handleValidationErrors, getEvent)
+  .put(validateMongoId, handleValidationErrors, updateEvent)
+  .delete(validateMongoId, handleValidationErrors, deleteEvent);
 
 // Customer management
 router.get('/customers', validatePagination, handleValidationErrors, getAllCustomers);

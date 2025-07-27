@@ -393,10 +393,91 @@ exports.getAllProducts = async (req, res, next) => {
 // @access  Private (Admin)
 exports.createProduct = async (req, res, next) => {
   try {
-    const product = await Product.create({
-      ...req.body,
-      createdBy: req.user.id
-    });
+    const {
+      name,
+      description,
+      price,
+      category,
+      stock,
+      image,
+      isActive = true,
+      isFeatured = false,
+      organicCertified = false,
+      specifications
+    } = req.body;
+
+    // Validate required fields
+    if (!name || !description || !price || !category || stock === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields',
+        errors: {
+          name: !name ? 'Product name is required' : null,
+          description: !description ? 'Product description is required' : null,
+          price: !price ? 'Product price is required' : null,
+          category: !category ? 'Product category is required' : null,
+          stock: stock === undefined ? 'Stock quantity is required' : null
+        }
+      });
+    }
+
+    // Validate category enum
+    const validCategories = ['Chips', 'Juices', 'Milk', 'Supplements', 'Fruits', 'Vegetables', 'Herbs', 'Nuts', 'Other'];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid category. Must be one of: ${validCategories.join(', ')}`
+      });
+    }
+
+    // Handle both stock formats: number or object
+    let stockData;
+    if (typeof stock === 'number') {
+      stockData = {
+        quantity: parseInt(stock),
+        lowStockThreshold: 10,
+        isAvailable: parseInt(stock) > 0
+      };
+    } else if (typeof stock === 'object' && stock.quantity !== undefined) {
+      stockData = {
+        quantity: parseInt(stock.quantity),
+        lowStockThreshold: stock.lowStockThreshold || 10,
+        isAvailable: parseInt(stock.quantity) > 0
+      };
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid stock format'
+      });
+    }
+
+    const productData = {
+      name,
+      description,
+      price: parseFloat(price),
+      category,
+      stock: stockData,
+      isActive,
+      isFeatured,
+      organicCertified,
+      createdBy: req.user ? req.user._id : null
+    };
+
+    // Add specifications if provided
+    if (specifications) {
+      productData.specifications = specifications;
+    }
+
+    // Add image if provided
+    if (image) {
+      productData.images = [{
+        url: image,
+        alt: name,
+        isPrimary: true
+      }];
+    }
+
+    const product = await Product.create(productData);
 
     res.status(201).json({
       success: true,
@@ -404,6 +485,18 @@ exports.createProduct = async (req, res, next) => {
       data: product
     });
   } catch (error) {
+    console.error('Product creation error:', error);
+    if (error.name === 'ValidationError') {
+      const errors = {};
+      Object.keys(error.errors).forEach(key => {
+        errors[key] = error.errors[key].message;
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors
+      });
+    }
     next(error);
   }
 };
@@ -652,6 +745,117 @@ exports.getSalesAnalytics = async (req, res, next) => {
         paymentMethods,
         deliveryTypes
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// EVENT MANAGEMENT ENDPOINTS
+// ==========================================
+
+// @desc    Get all events (Admin)
+// @route   GET /api/admin/events
+// @access  Private (Admin)
+exports.getAllEvents = async (req, res, next) => {
+  try {
+    const events = await Event.find({})
+      .sort({ createdAt: -1 })
+      .populate('createdBy', 'name email');
+
+    res.status(200).json({
+      success: true,
+      count: events.length,
+      data: events
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get single event (Admin)
+// @route   GET /api/admin/events/:id
+// @access  Private (Admin)
+exports.getEvent = async (req, res, next) => {
+  try {
+    const event = await Event.findById(req.params.id)
+      .populate('createdBy', 'name email');
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: event
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update event (Admin)
+// @route   PUT /api/admin/events/:id
+// @access  Private (Admin)
+exports.updateEvent = async (req, res, next) => {
+  try {
+    const event = await Event.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, lastUpdatedBy: req.user._id },
+      { new: true, runValidators: true }
+    );
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Event updated successfully',
+      data: event
+    });
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const errors = {};
+      Object.keys(error.errors).forEach(key => {
+        errors[key] = error.errors[key].message;
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors
+      });
+    }
+    next(error);
+  }
+};
+
+// @desc    Delete event (Admin)
+// @route   DELETE /api/admin/events/:id
+// @access  Private (Admin)
+exports.deleteEvent = async (req, res, next) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
+    }
+
+    await Event.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Event deleted successfully'
     });
   } catch (error) {
     next(error);

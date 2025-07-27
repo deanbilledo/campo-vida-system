@@ -334,7 +334,9 @@ export const CartProvider = ({ children }) => {
   const value = {
     ...state,
     addItem,
+    addToCart: addItem, // Alias for backward compatibility
     removeItem,
+    removeFromCart: removeItem, // Alias for backward compatibility
     updateQuantity,
     clearCart,
     toggleCart,
@@ -346,6 +348,10 @@ export const CartProvider = ({ children }) => {
     getFinalTotal,
     getCartSummary,
     validateCart,
+    // Additional aliases for common naming conventions
+    cartItems: state.items,
+    cartTotal: state.total,
+    cartCount: state.itemCount,
   };
 
   return (

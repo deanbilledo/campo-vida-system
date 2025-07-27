@@ -13,6 +13,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import LoadingSpinner from './components/ui/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Pages
 import Home from './pages/Home';
@@ -52,7 +53,6 @@ import DriverProfile from './pages/driver/DriverProfile';
 
 // Error pages
 import NotFound from './pages/errors/NotFound';
-import ErrorBoundary from './components/errors/ErrorBoundary';
 
 // Create a client for React Query
 const queryClient = new QueryClient({

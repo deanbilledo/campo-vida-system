@@ -15,6 +15,7 @@ import {
   PhoneIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
+import apiClient from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import Button from '../components/ui/Button';
@@ -127,32 +128,20 @@ const Checkout = () => {
         userId: user.id,
       };
 
-      // Simulate API call to create order
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(orderData),
-      });
+      // API call to create order
+      const response = await apiClient.post('/api/orders', orderData);
 
-      if (response.ok) {
-        const order = await response.json();
-        
-        // Handle different payment methods
-        if (data.paymentMethod === 'gcash') {
-          // Redirect to GCash payment
-          window.location.href = `/payment/gcash?orderId=${order.id}`;
-        } else if (data.paymentMethod === 'cod') {
-          // Clear cart and redirect to success page
-          clearCart();
-          toast.success('Order placed successfully!');
-          navigate(`/order-success/${order.id}`);
-        }
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'Failed to place order');
+      const order = response.data;
+      
+      // Handle different payment methods
+      if (data.paymentMethod === 'gcash') {
+        // Redirect to GCash payment
+        window.location.href = `/payment/gcash?orderId=${order.id}`;
+      } else if (data.paymentMethod === 'cod') {
+        // Clear cart and redirect to success page
+        clearCart();
+        toast.success('Order placed successfully!');
+        navigate(`/order-success/${order.id}`);
       }
     } catch (error) {
       toast.error('Something went wrong. Please try again.');

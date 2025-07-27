@@ -14,6 +14,8 @@ import Button, { IconButton } from '../components/ui/Button';
 import Input, { Select } from '../components/ui/Input';
 import { useCart } from '../context/CartContext';
 import LoadingSpinner, { SkeletonLoader } from '../components/ui/LoadingSpinner';
+import apiClient from '../services/api';
+import toast from 'react-hot-toast';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,138 +33,17 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Mock data - replace with API call
-  const mockProducts = [
-    {
-      _id: '1',
-      name: 'Fresh Pineapples',
-      price: 85,
-      originalPrice: 95,
-      images: ['/img/pineapple.jpg'],
-      category: 'fruits',
-      stock: 25,
-      rating: 4.8,
-      reviewCount: 142,
-      unit: 'piece',
-      description: 'Sweet and juicy pineapples grown in the volcanic soil of Benguet.',
-      isNew: true,
-      isFeatured: true,
-    },
-    {
-      _id: '2',
-      name: 'Organic Mixed Vegetables',
-      price: 120,
-      originalPrice: 150,
-      images: ['/img/20250709_153424.jpg'],
-      category: 'vegetables',
-      stock: 15,
-      rating: 4.9,
-      reviewCount: 98,
-      unit: 'bundle',
-      description: 'Fresh assortment of organic vegetables including lettuce, carrots, and herbs.',
-      isNew: false,
-      isFeatured: true,
-    },
-    {
-      _id: '3',
-      name: 'Fresh Leafy Greens',
-      price: 65,
-      originalPrice: 75,
-      images: ['/img/20250709_153634.jpg'],
-      category: 'vegetables',
-      stock: 30,
-      rating: 4.7,
-      reviewCount: 76,
-      unit: 'bundle',
-      description: 'Crisp and fresh leafy greens perfect for salads and healthy meals.',
-      isNew: true,
-      isFeatured: false,
-    },
-    {
-      _id: '4',
-      name: 'Premium Vegetables Bundle',
-      price: 150,
-      originalPrice: 180,
-      images: ['/img/20250715_132607.jpg'],
-      category: 'vegetables',
-      stock: 12,
-      rating: 5.0,
-      reviewCount: 203,
-      unit: 'bundle',
-      description: 'Premium selection of fresh vegetables harvested this morning.',
-      isNew: false,
-      isFeatured: true,
-    },
-    {
-      _id: '5',
-      name: 'Garden Fresh Vegetables',
-      price: 95,
-      originalPrice: 110,
-      images: ['/img/20250715_132621.jpg'],
-      category: 'vegetables',
-      stock: 20,
-      rating: 4.6,
-      reviewCount: 89,
-      unit: 'bundle',
-      description: 'Garden-fresh vegetables straight from our partner farms.',
-      isNew: false,
-      isFeatured: false,
-    },
-    {
-      _id: '6',
-      name: 'Organic Root Vegetables',
-      price: 75,
-      originalPrice: 90,
-      images: ['/img/20250715_132626.jpg'],
-      category: 'vegetables',
-      stock: 18,
-      rating: 4.8,
-      reviewCount: 67,
-      unit: 'bundle',
-      description: 'Fresh root vegetables including carrots, radishes, and sweet potatoes.',
-      isNew: false,
-      isFeatured: false,
-    },
-    {
-      _id: '7',
-      name: 'Farm Fresh Produce',
-      price: 180,
-      originalPrice: 200,
-      images: ['/img/20250715_133203.jpg'],
-      category: 'mixed',
-      stock: 14,
-      rating: 4.9,
-      reviewCount: 156,
-      unit: 'bundle',
-      description: 'Mixed selection of the freshest produce available today.',
-      isNew: true,
-      isFeatured: true,
-    },
-    {
-      _id: '8',
-      name: 'Seasonal Harvest Mix',
-      price: 110,
-      originalPrice: 130,
-      images: ['/img/20250715_133213.jpg'],
-      category: 'mixed',
-      stock: 0,
-      rating: 4.7,
-      reviewCount: 92,
-      unit: 'bundle',
-      description: 'Seasonal mix of fruits and vegetables at peak freshness.',
-      isNew: false,
-      isFeatured: false,
-    },
-  ];
-
   const categories = [
     { value: 'all', label: 'All Categories' },
-    { value: 'vegetables', label: 'Vegetables' },
-    { value: 'fruits', label: 'Fruits' },
-    { value: 'mixed', label: 'Mixed Bundles' },
-    { value: 'herbs', label: 'Herbs' },
-    { value: 'pantry', label: 'Pantry Items' },
-    { value: 'dairy', label: 'Dairy' },
+    { value: 'Vegetables', label: 'Vegetables' },
+    { value: 'Fruits', label: 'Fruits' },
+    { value: 'Herbs', label: 'Herbs' },
+    { value: 'Nuts', label: 'Nuts' },
+    { value: 'Chips', label: 'Chips' },
+    { value: 'Juices', label: 'Juices' },
+    { value: 'Milk', label: 'Milk' },
+    { value: 'Supplements', label: 'Supplements' },
+    { value: 'Other', label: 'Other' }
   ];
 
   const sortOptions = [
@@ -174,69 +55,41 @@ const Products = () => {
     { value: 'newest', label: 'Newest First' },
   ];
 
-  // Simulate API call
+  // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      let filteredProducts = [...mockProducts];
-      
-      // Apply filters
-      if (searchQuery) {
-        filteredProducts = filteredProducts.filter(product =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-      
-      if (selectedCategory !== 'all') {
-        filteredProducts = filteredProducts.filter(product =>
-          product.category === selectedCategory
-        );
-      }
-      
-      if (priceRange.min) {
-        filteredProducts = filteredProducts.filter(product =>
-          product.price >= parseInt(priceRange.min)
-        );
-      }
-      
-      if (priceRange.max) {
-        filteredProducts = filteredProducts.filter(product =>
-          product.price <= parseInt(priceRange.max)
-        );
-      }
-      
-      // Apply sorting
-      filteredProducts.sort((a, b) => {
-        switch (sortBy) {
-          case 'name':
-            return a.name.localeCompare(b.name);
-          case '-name':
-            return b.name.localeCompare(a.name);
-          case 'price':
-            return a.price - b.price;
-          case '-price':
-            return b.price - a.price;
-          case 'rating':
-            return b.rating - a.rating;
-          case 'newest':
-            return b.isNew - a.isNew;
-          default:
-            return 0;
+      try {
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (searchQuery) params.append('search', searchQuery);
+        if (selectedCategory !== 'all') params.append('category', selectedCategory);
+        if (priceRange.min) params.append('minPrice', priceRange.min);
+        if (priceRange.max) params.append('maxPrice', priceRange.max);
+        if (sortBy) params.append('sort', sortBy);
+        params.append('page', currentPage);
+        params.append('limit', 12);
+        
+        const response = await apiClient.get(`/api/products?${params.toString()}`);
+        
+        if (response.data.success) {
+          setProducts(response.data.data || []);
+          setTotalPages(response.data.pagination?.pages || 1);
+        } else {
+          throw new Error('Failed to fetch products');
         }
-      });
-      
-      setProducts(filteredProducts);
-      setTotalPages(Math.ceil(filteredProducts.length / 12));
-      setLoading(false);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        toast.error('Failed to load products');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProducts();
-  }, [searchQuery, selectedCategory, priceRange, sortBy]);
+  }, [searchQuery, selectedCategory, priceRange, sortBy, currentPage]);
 
   // Update URL params
   useEffect(() => {
@@ -455,7 +308,7 @@ const Products = () => {
                       <div className="relative overflow-hidden">
                         <Link to={`/products/${product._id}`}>
                           <img
-                            src={product.images[0]}
+                            src={product.images?.[0]?.url || '/img/placeholder.jpg'}
                             alt={product.name}
                             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                           />
@@ -494,9 +347,9 @@ const Products = () => {
                             size="sm"
                             fullWidth
                             onClick={() => handleAddToCart(product)}
-                            disabled={product.stock === 0}
+                            disabled={!product.stock || product.stock.quantity === 0}
                           >
-                            {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                            {!product.stock || product.stock.quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
                           </Button>
                         </div>
                       </div>
@@ -539,11 +392,11 @@ const Products = () => {
                                 ₱{product.originalPrice}
                               </span>
                             )}
-                            <span className="text-xs text-gray-500">/ {product.unit}</span>
+                            <span className="text-xs text-gray-500">/ {product.specifications?.weight?.unit || 'piece'}</span>
                           </div>
                           
                           <div className="text-xs text-gray-500">
-                            {product.stock} left
+                            {product.stock?.quantity || 0} left
                           </div>
                         </div>
                       </div>

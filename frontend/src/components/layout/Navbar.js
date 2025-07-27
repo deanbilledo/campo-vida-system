@@ -82,10 +82,12 @@ const Navbar = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CV</span>
-              </div>
+            <Link to="/" className="flex items-center space-x-3">
+              <img 
+                src="/img/campo-vida-logo.jpeg" 
+                alt="Campo Vida Logo"
+                className="w-10 h-10 object-cover rounded-full border-2 border-primary-200"
+              />
               <span className="text-xl font-bold gradient-text">Campo Vida</span>
             </Link>
           </motion.div>

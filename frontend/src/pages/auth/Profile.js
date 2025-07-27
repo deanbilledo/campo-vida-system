@@ -16,6 +16,7 @@ import {
   ExclamationTriangleIcon,
   CameraIcon,
 } from '@heroicons/react/24/outline';
+import apiClient from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/Button';
 import Input, { Textarea } from '../../components/ui/Input';
@@ -111,27 +112,15 @@ const Profile = () => {
     setIsChangingPassword(true);
     try {
       // API call to change password
-      const response = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          currentPassword: data.currentPassword,
-          newPassword: data.newPassword,
-        }),
+      const response = await apiClient.post('/api/auth/change-password', {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
       });
 
-      if (response.ok) {
-        toast.success('Password changed successfully!');
-        passwordForm.reset();
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'Failed to change password');
-      }
+      toast.success('Password changed successfully!');
+      passwordForm.reset();
     } catch (error) {
-      toast.error('Failed to change password. Please try again.');
+      toast.error(error.response?.data?.message || 'Failed to change password');
     } finally {
       setIsChangingPassword(false);
     }

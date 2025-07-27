@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../services/api';
 import toast from 'react-hot-toast';
 
 // Initial state
@@ -31,7 +31,6 @@ const authReducer = (state, action) => {
         ...state,
         loading: action.payload,
       };
-
     case AUTH_ACTIONS.LOGIN_SUCCESS:
     case AUTH_ACTIONS.REGISTER_SUCCESS:
       localStorage.setItem('token', action.payload.token);
@@ -40,35 +39,15 @@ const authReducer = (state, action) => {
         user: action.payload.user,
         token: action.payload.token,
         isAuthenticated: true,
-        codEligible: action.payload.user?.codEligible || false,
         loading: false,
       };
-
     case AUTH_ACTIONS.LOAD_USER_SUCCESS:
       return {
         ...state,
         user: action.payload,
         isAuthenticated: true,
-        codEligible: action.payload?.codEligible || false,
         loading: false,
       };
-
-    case AUTH_ACTIONS.UPDATE_USER:
-      return {
-        ...state,
-        user: { ...state.user, ...action.payload },
-        codEligible: action.payload?.codEligible !== undefined 
-          ? action.payload.codEligible 
-          : state.codEligible,
-      };
-
-    case AUTH_ACTIONS.UPDATE_COD_ELIGIBILITY:
-      return {
-        ...state,
-        codEligible: action.payload,
-        user: state.user ? { ...state.user, codEligible: action.payload } : null,
-      };
-
     case AUTH_ACTIONS.LOGOUT:
     case AUTH_ACTIONS.AUTH_ERROR:
       localStorage.removeItem('token');
@@ -77,17 +56,26 @@ const authReducer = (state, action) => {
         user: null,
         token: null,
         isAuthenticated: false,
-        codEligible: false,
         loading: false,
+        codEligible: false,
       };
-
+    case AUTH_ACTIONS.UPDATE_USER:
+      return {
+        ...state,
+        user: { ...state.user, ...action.payload },
+      };
+    case AUTH_ACTIONS.UPDATE_COD_ELIGIBILITY:
+      return {
+        ...state,
+        codEligible: action.payload,
+      };
     default:
       return state;
   }
 };
 
 // Create context
-const AuthContext = createContext();
+const AuthContext = createContext({});
 
 // Custom hook to use auth context
 export const useAuth = () => {
@@ -98,16 +86,16 @@ export const useAuth = () => {
   return context;
 };
 
-// AuthProvider component
+// Auth provider component
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Set axios default header
+  // Set axios default header when token changes
   useEffect(() => {
     if (state.token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
     } else {
-      delete axios.defaults.headers.common['Authorization'];
+      delete apiClient.defaults.headers.common['Authorization'];
     }
   }, [state.token]);
 
@@ -118,12 +106,12 @@ export const AuthProvider = ({ children }) => {
     } else {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load user data
   const loadUser = async () => {
     try {
-      const response = await axios.get('/api/auth/me');
+      const response = await apiClient.get('/api/auth/me');
       dispatch({
         type: AUTH_ACTIONS.LOAD_USER_SUCCESS,
         payload: response.data.data,
@@ -139,7 +127,7 @@ export const AuthProvider = ({ children }) => {
     try {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
       
-      const response = await axios.post('/api/auth/login', {
+      const response = await apiClient.post('/api/auth/login', {
         email,
         password,
       });
@@ -149,7 +137,7 @@ export const AuthProvider = ({ children }) => {
         payload: response.data,
       });
 
-      toast.success('Welcome back!');
+      toast.success(`Welcome back, ${response.data.user.firstName}!`);
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.message || 'Login failed';
@@ -164,7 +152,7 @@ export const AuthProvider = ({ children }) => {
     try {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
       
-      const response = await axios.post('/api/auth/register', userData);
+      const response = await apiClient.post('/api/auth/register', userData);
 
       dispatch({
         type: AUTH_ACTIONS.REGISTER_SUCCESS,
@@ -184,7 +172,7 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = async () => {
     try {
-      await axios.post('/api/auth/logout');
+      await apiClient.post('/api/auth/logout');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -196,7 +184,7 @@ export const AuthProvider = ({ children }) => {
   // Update profile function
   const updateProfile = async (userData) => {
     try {
-      const response = await axios.put('/api/auth/profile', userData);
+      const response = await apiClient.put('/api/auth/profile', userData);
       
       dispatch({
         type: AUTH_ACTIONS.UPDATE_USER,
@@ -215,7 +203,7 @@ export const AuthProvider = ({ children }) => {
   // Change password function
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      await axios.put('/api/auth/change-password', {
+      await apiClient.put('/api/auth/change-password', {
         currentPassword,
         newPassword,
       });
@@ -232,8 +220,7 @@ export const AuthProvider = ({ children }) => {
   // Forgot password function
   const forgotPassword = async (email) => {
     try {
-      await axios.post('/api/auth/forgot-password', { email });
-      
+      await apiClient.post('/api/auth/forgot-password', { email });
       toast.success('Password reset email sent');
       return { success: true };
     } catch (error) {
@@ -246,7 +233,7 @@ export const AuthProvider = ({ children }) => {
   // Reset password function
   const resetPassword = async (token, password) => {
     try {
-      const response = await axios.put(`/api/auth/reset-password/${token}`, {
+      const response = await apiClient.put(`/api/auth/reset-password/${token}`, {
         password,
       });
 
@@ -267,7 +254,7 @@ export const AuthProvider = ({ children }) => {
   // Check COD eligibility
   const checkCodEligibility = async () => {
     try {
-      const response = await axios.get('/api/auth/cod-eligibility');
+      const response = await apiClient.get('/api/auth/cod-eligibility');
       
       dispatch({
         type: AUTH_ACTIONS.UPDATE_COD_ELIGIBILITY,
@@ -283,17 +270,14 @@ export const AuthProvider = ({ children }) => {
 
   // Refresh user data
   const refreshUser = async () => {
-    if (state.token) {
-      await loadUser();
-    }
+    await loadUser();
   };
 
-  // Check if user has specific role
+  // Helper functions for role checking
   const hasRole = (role) => {
     return state.user?.role === role;
   };
 
-  // Check if user has any of the specified roles
   const hasAnyRole = (roles) => {
     return roles.includes(state.user?.role);
   };
@@ -320,3 +304,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export default AuthContext;

@@ -384,3 +384,254 @@ exports.registerForEvent = async (req, res, next) => {
     next(error);
   }
 };
+
+// Admin CRUD Operations
+
+// @desc    Create new event (Admin)
+// @route   POST /api/admin/events
+// @access  Private (Admin)
+exports.createEvent = async (req, res, next) => {
+  try {
+    console.log('Event creation request body:', req.body);
+    
+    const {
+      title,
+      description,
+      category,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      venue,
+      address,
+      organizerName,
+      organizerEmail,
+      maxAttendees,
+      price,
+      isActive,
+      isFeatured,
+      image
+    } = req.body;
+
+    // Validate required fields
+    if (!title || !description || !category || !startDate || !startTime || !endTime || !venue || !organizerName || !organizerEmail) {
+      console.log('Validation failed:', {
+        title: !title ? 'Title is required' : null,
+        description: !description ? 'Description is required' : null,
+        category: !category ? 'Category is required' : null,
+        startDate: !startDate ? 'Start date is required' : null,
+        startTime: !startTime ? 'Start time is required' : null,
+        endTime: !endTime ? 'End time is required' : null,
+        venue: !venue ? 'Venue is required' : null,
+        organizerName: !organizerName ? 'Organizer name is required' : null,
+        organizerEmail: !organizerEmail ? 'Organizer email is required' : null
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields',
+        errors: {
+          title: !title ? 'Title is required' : null,
+          description: !description ? 'Description is required' : null,
+          category: !category ? 'Category is required' : null,
+          startDate: !startDate ? 'Start date is required' : null,
+          startTime: !startTime ? 'Start time is required' : null,
+          endTime: !endTime ? 'End time is required' : null,
+          venue: !venue ? 'Venue is required' : null,
+          organizerName: !organizerName ? 'Organizer name is required' : null,
+          organizerEmail: !organizerEmail ? 'Organizer email is required' : null
+        }
+      });
+    }
+
+    // Validate category enum
+    const validCategories = ['Workshop', 'Product Launch', 'Health Seminar', 'Cooking Class', 'Wellness Talk', 'Community Event', 'Other'];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid category. Must be one of: ${validCategories.join(', ')}`
+      });
+    }
+
+    const event = await Event.create({
+      title,
+      description,
+      category,
+      startDate: new Date(startDate),
+      endDate: endDate ? new Date(endDate) : new Date(startDate),
+      startTime,
+      endTime,
+      location: {
+        venue,
+        address: typeof address === 'string' ? { street: address } : address,
+        isOnline: false
+      },
+      organizer: {
+        name: organizerName,
+        email: organizerEmail,
+        organization: 'Campo Vida'
+      },
+      registration: {
+        isRequired: true,
+        capacity: maxAttendees || 50,
+        currentRegistrations: 0,
+        fee: price || 0
+      },
+      pricing: {
+        isFree: !price || price === 0,
+        price: price || 0,
+        currency: 'PHP'
+      },
+      isFeatured: isFeatured || false,
+      status: isActive ? 'published' : 'draft',
+      isVisible: isActive !== false,
+      media: {
+        featuredImage: image || '',
+        gallery: image ? [image] : []
+      },
+      createdBy: req.user ? req.user._id : null
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Event created successfully',
+      data: { event }
+    });
+  } catch (error) {
+    console.error('Event creation error:', error);
+    if (error.name === 'ValidationError') {
+      const errors = {};
+      Object.keys(error.errors).forEach(key => {
+        errors[key] = error.errors[key].message;
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors
+      });
+    }
+    next(error);
+  }
+};
+
+// @desc    Update event (Admin)
+// @route   PUT /api/admin/events/:id
+// @access  Private (Admin)
+exports.updateEvent = async (req, res, next) => {
+  try {
+    const {
+      title,
+      description,
+      dateTime,
+      location,
+      category,
+      maxAttendees,
+      price,
+      isActive,
+      isFeatured,
+      image
+    } = req.body;
+
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
+    }
+
+    // Update event fields
+    event.title = title || event.title;
+    event.description = description || event.description;
+    event.startDate = dateTime || event.startDate;
+    event.endDate = dateTime || event.endDate;
+    event.location.venue = location || event.location.venue;
+    event.location.address = location || event.location.address;
+    event.category = category || event.category;
+    event.registration.capacity = maxAttendees || event.registration.capacity;
+    event.pricing.price = price !== undefined ? price : event.pricing.price;
+    event.pricing.isFree = price === 0;
+    event.isFeatured = isFeatured !== undefined ? isFeatured : event.isFeatured;
+    event.status = isActive ? 'published' : 'draft';
+    event.isVisible = isActive !== undefined ? isActive : event.isVisible;
+    
+    if (image) {
+      event.media.featuredImage = image;
+      if (!event.media.gallery.includes(image)) {
+        event.media.gallery.push(image);
+      }
+    }
+
+    await event.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Event updated successfully',
+      data: { event }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Delete event (Admin)
+// @route   DELETE /api/admin/events/:id
+// @access  Private (Admin)
+exports.deleteEvent = async (req, res, next) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
+    }
+
+    await event.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: 'Event deleted successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all events for admin (including drafts)
+// @route   GET /api/admin/events
+// @access  Private (Admin)
+exports.getAdminEvents = async (req, res, next) => {
+  try {
+    const events = await Event.find({})
+      .populate('organizer', 'firstName lastName email')
+      .sort({ createdAt: -1 });
+
+    // Transform for admin interface
+    const transformedEvents = events.map(event => ({
+      _id: event._id,
+      title: event.title,
+      description: event.description,
+      dateTime: event.startDate,
+      location: event.location.venue || event.location.address,
+      category: event.category,
+      maxAttendees: event.registration.capacity === 999999 ? null : event.registration.capacity,
+      currentAttendees: event.registration.currentRegistrations,
+      price: event.pricing.price,
+      isActive: event.isVisible,
+      isFeatured: event.isFeatured,
+      image: event.media.featuredImage,
+      status: event.status,
+      createdAt: event.createdAt
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: transformedEvents.length,
+      data: { events: transformedEvents }
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -97,10 +97,12 @@ const Footer = () => {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <Link to="/" className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">CV</span>
-                </div>
+              <Link to="/" className="flex items-center space-x-3 mb-4">
+                <img 
+                  src="/img/campo-vida-logo.jpeg" 
+                  alt="Campo Vida Logo"
+                  className="w-12 h-12 object-cover rounded-full border-2 border-primary-400"
+                />
                 <span className="text-xl font-bold text-white">Campo Vida</span>
               </Link>
               
