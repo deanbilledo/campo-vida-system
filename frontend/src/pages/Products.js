@@ -308,7 +308,13 @@ const Products = () => {
                       <div className="relative overflow-hidden">
                         <Link to={`/products/${product._id}`}>
                           <img
-                            src={product.images?.[0]?.url || '/img/placeholder.jpg'}
+                            src={
+                              product.images?.[0]?.url 
+                                ? (product.images[0].url.startsWith('http') 
+                                    ? product.images[0].url 
+                                    : `http://localhost:5000${product.images[0].url}`)
+                                : '/img/placeholder.jpg'
+                            }
                             alt={product.name}
                             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                           />

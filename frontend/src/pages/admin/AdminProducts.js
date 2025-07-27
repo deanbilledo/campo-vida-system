@@ -370,33 +370,16 @@ const AdminProducts = () => {
               />
 
               <div className="col-span-2">
-                <Input
-                  label="Product Image URL"
-                  name="image"
-                  type="url"
-                  value={formData.image}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
+                <ImageUpload
+                  onImageUpload={handleImageUpload}
+                  currentImage={formData.imageUrl ? 
+                    (formData.imageUrl.startsWith('http') ? 
+                      formData.imageUrl : 
+                      `http://localhost:5000${formData.imageUrl}`
+                    ) : ''
+                  }
+                  label="Product Image"
                 />
-                {formData.image && (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
-                    <div className="w-32 h-32 border border-gray-300 rounded-lg overflow-hidden">
-                      <img
-                        src={formData.image}
-                        alt="Product preview"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextElementSibling.style.display = 'flex';
-                        }}
-                      />
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm" style={{display: 'none'}}>
-                        Invalid image URL
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
               
               <div className="space-y-4">

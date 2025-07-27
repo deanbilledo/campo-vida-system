@@ -407,7 +407,7 @@ exports.createProduct = async (req, res, next) => {
     } = req.body;
 
     // Validate required fields
-    if (!name || !description || !price || !category || stock === undefined) {
+    if (!name || !description || !price || !category || stock === undefined || stock === null || stock === '') {
       return res.status(400).json({
         success: false,
         message: 'Missing required fields',
@@ -416,7 +416,7 @@ exports.createProduct = async (req, res, next) => {
           description: !description ? 'Product description is required' : null,
           price: !price ? 'Product price is required' : null,
           category: !category ? 'Product category is required' : null,
-          stock: stock === undefined ? 'Stock quantity is required' : null
+          stock: (stock === undefined || stock === null || stock === '') ? 'Stock quantity is required' : null
         }
       });
     }
@@ -430,19 +430,33 @@ exports.createProduct = async (req, res, next) => {
       });
     }
 
-    // Handle both stock formats: number or object
+    // Handle both stock formats: number, string, or object
     let stockData;
-    if (typeof stock === 'number') {
+    if (typeof stock === 'number' || typeof stock === 'string') {
+      const stockQuantity = parseInt(stock);
+      if (isNaN(stockQuantity) || stockQuantity < 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Stock quantity must be a valid non-negative number'
+        });
+      }
       stockData = {
-        quantity: parseInt(stock),
+        quantity: stockQuantity,
         lowStockThreshold: 10,
-        isAvailable: parseInt(stock) > 0
+        isAvailable: stockQuantity > 0
       };
     } else if (typeof stock === 'object' && stock.quantity !== undefined) {
+      const stockQuantity = parseInt(stock.quantity);
+      if (isNaN(stockQuantity) || stockQuantity < 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Stock quantity must be a valid non-negative number'
+        });
+      }
       stockData = {
-        quantity: parseInt(stock.quantity),
+        quantity: stockQuantity,
         lowStockThreshold: stock.lowStockThreshold || 10,
-        isAvailable: parseInt(stock.quantity) > 0
+        isAvailable: stockQuantity > 0
       };
     } else {
       return res.status(400).json({
@@ -468,8 +482,11 @@ exports.createProduct = async (req, res, next) => {
       productData.specifications = specifications;
     }
 
-    // Add image if provided
-    if (image) {
+    // Handle images from frontend (array format)
+    if (req.body.images && Array.isArray(req.body.images) && req.body.images.length > 0) {
+      productData.images = req.body.images;
+    } else if (image) {
+      // Fallback for single image
       productData.images = [{
         url: image,
         alt: name,

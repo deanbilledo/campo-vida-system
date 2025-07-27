@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const auth = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -47,7 +47,7 @@ const upload = multer({
 });
 
 // Upload single product image
-router.post('/product', auth, upload.single('image'), (req, res) => {
+router.post('/product', protect, upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -81,7 +81,7 @@ router.post('/product', auth, upload.single('image'), (req, res) => {
 });
 
 // Delete uploaded image
-router.delete('/product/:filename', auth, (req, res) => {
+router.delete('/product/:filename', protect, (req, res) => {
   try {
     const filename = req.params.filename;
     const filePath = path.join(uploadsDir, filename);
