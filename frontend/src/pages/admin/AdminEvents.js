@@ -30,6 +30,8 @@ const AdminEvents = () => {
     price: '',
     isActive: true,
     isFeatured: false,
+    status: 'published',
+    isVisible: true,
     image: ''
   });
   const [submitting, setSubmitting] = useState(false);
@@ -88,15 +90,23 @@ const AdminEvents = () => {
         endDate: formData.date,
         startTime: formData.time,
         endTime: formData.time, // Using same time for both start and end
-        venue: formData.location,
-        address: formData.location,
-        organizerName: 'Campo Vida Team',
-        organizerEmail: 'admin@campo-vida.com',
+        location: {
+          venue: formData.location,
+          address: {
+            street: formData.location
+          }
+        },
+        organizer: {
+          name: 'Campo Vida Team',
+          email: 'admin@campo-vida.com'
+        },
         maxAttendees: parseInt(formData.maxAttendees) || 50,
         price: parseFloat(formData.price) || 0,
         isActive: formData.isActive,
         isFeatured: formData.isFeatured,
-        image: formData.image
+        status: formData.status || 'published',
+        isVisible: formData.isVisible !== false,
+        images: formData.image ? [{ url: formData.image, alt: formData.title, isPrimary: true }] : []
       };
 
       if (editingEvent) {
@@ -138,6 +148,8 @@ const AdminEvents = () => {
       price: event.registration?.fee?.toString() || '0',
       isActive: event.status === 'published' || event.isActive !== false,
       isFeatured: event.isFeatured || false,
+      status: event.status || 'published',
+      isVisible: event.isVisible !== false,
       image: event.images?.[0]?.url || ''
     });
     setIsModalOpen(true);
@@ -168,6 +180,8 @@ const AdminEvents = () => {
       price: '',
       isActive: true,
       isFeatured: false,
+      status: 'published',
+      isVisible: true,
       image: ''
     });
     setEditingEvent(null);
@@ -459,6 +473,34 @@ const AdminEvents = () => {
               />
               
               <div className="space-y-4">
+                <Select
+                  label="Event Status"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleInputChange}
+                  options={[
+                    { value: 'draft', label: 'Draft' },
+                    { value: 'published', label: 'Published' },
+                    { value: 'cancelled', label: 'Cancelled' },
+                    { value: 'postponed', label: 'Postponed' }
+                  ]}
+                  required
+                />
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isVisible"
+                    name="isVisible"
+                    checked={formData.isVisible}
+                    onChange={handleInputChange}
+                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  />
+                  <label htmlFor="isVisible" className="ml-2 text-sm font-medium text-gray-700">
+                    Visible on Website
+                  </label>
+                </div>
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"

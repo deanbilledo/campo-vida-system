@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRightIcon,
-  CheckIcon,
   StarIcon,
   TruckIcon,
   ShieldCheckIcon,
   HeartIcon,
+  CalendarIcon,
+  MapPinIcon,
+  CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import Button from '../components/ui/Button';
 
@@ -434,6 +436,149 @@ const NewsletterSection = () => {
   );
 };
 
+// Featured Events Section Component
+const FeaturedEventsSection = () => {
+  const [events, setEvents] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchFeaturedEvents = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/events?featured=true&limit=3');
+        const data = await response.json();
+        if (data.success) {
+          setEvents(data.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching featured events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedEvents();
+  }, []);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const formatPrice = (price) => {
+    return price > 0 ? `₱${price.toLocaleString()}` : 'Free';
+  };
+
+  if (loading || events.length === 0) {
+    return null; // Don't show section if no events or loading
+  }
+
+  return (
+    <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Upcoming Events</h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Join us for educational workshops, health seminars, and community events focused on organic living and wellness.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {events.map((event, index) => (
+            <motion.div
+              key={event._id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+            >
+              {/* Event Image */}
+              <div className="relative h-48 bg-gradient-to-br from-green-400 to-blue-500 overflow-hidden">
+                {event.images?.[0]?.url ? (
+                  <img
+                    src={event.images[0].url}
+                    alt={event.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white text-6xl">
+                    🌿
+                  </div>
+                )}
+                <div className="absolute top-4 left-4">
+                  <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-green-700">
+                    {event.category}
+                  </span>
+                </div>
+              </div>
+
+              {/* Event Content */}
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-green-600 transition-colors">
+                  {event.title}
+                </h3>
+                
+                <p className="text-gray-600 mb-4 line-clamp-2">
+                  {event.description}
+                </p>
+
+                {/* Event Details */}
+                <div className="space-y-2 mb-6">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    <span>{formatDate(event.startDate)} at {event.startTime}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <MapPinIcon className="h-4 w-4 mr-2" />
+                    <span className="line-clamp-1">{event.location?.venue || 'TBA'}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <CurrencyDollarIcon className="h-4 w-4 mr-2" />
+                    <span>{formatPrice(event.registration?.fee || 0)}</span>
+                  </div>
+                </div>
+
+                {/* CTA Button */}
+                <Link
+                  to={`/events/${event._id}`}
+                  className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-3 rounded-lg font-medium transition-colors duration-200"
+                >
+                  Learn More
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* View All Events Button */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center mt-12"
+        >
+          <Link to="/events">
+            <Button size="lg" icon={ArrowRightIcon}>
+              View All Events
+            </Button>
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
 // Main Home Component
 const Home = () => {
   return (
@@ -441,6 +586,7 @@ const Home = () => {
       <HeroSection />
       <FeaturesSection />
       <FeaturedProductsSection />
+      <FeaturedEventsSection />
       <NewsletterSection />
     </div>
   );

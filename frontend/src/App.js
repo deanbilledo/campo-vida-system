@@ -28,6 +28,8 @@ import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
 import Events from './pages/Events';
 import EventDetail from './pages/EventDetail';
+import Posts from './pages/Posts';
+import PostDetail from './pages/PostDetail';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -44,6 +46,7 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminEvents from './pages/admin/AdminEvents';
+import AdminPosts from './pages/admin/AdminPosts';
 import AdminSettings from './pages/admin/AdminSettings';
 
 // Driver pages
@@ -151,6 +154,22 @@ function App() {
                         element={
                           <PageWrapper>
                             <EventDetail />
+                          </PageWrapper>
+                        } 
+                      />
+                      <Route 
+                        path="/posts" 
+                        element={
+                          <PageWrapper>
+                            <Posts />
+                          </PageWrapper>
+                        } 
+                      />
+                      <Route 
+                        path="/posts/:slug" 
+                        element={
+                          <PageWrapper>
+                            <PostDetail />
                           </PageWrapper>
                         } 
                       />
@@ -302,6 +321,16 @@ function App() {
                           <AdminRoute>
                             <PageWrapper>
                               <AdminEvents />
+                            </PageWrapper>
+                          </AdminRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/admin/posts" 
+                        element={
+                          <AdminRoute>
+                            <PageWrapper>
+                              <AdminPosts />
                             </PageWrapper>
                           </AdminRoute>
                         } 

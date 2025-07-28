@@ -293,7 +293,7 @@ productSchema.virtual('isSensitiveProduct').get(function() {
   const sensitiveThreshold = parseFloat(process.env.SENSITIVE_PRODUCT_PRICE_THRESHOLD) || 300;
   return this.price >= sensitiveThreshold || 
          this.isSensitive || 
-         this.sensitivityReasons.length > 0 ||
+         (this.sensitivityReasons && this.sensitivityReasons.length > 0) ||
          this.shippingInfo.isFragile ||
          this.shippingInfo.requiresRefrigeration;
 });
@@ -301,6 +301,11 @@ productSchema.virtual('isSensitiveProduct').get(function() {
 // Pre-save middleware to update timestamps and calculate sensitivity
 productSchema.pre('save', function(next) {
   this.lastUpdated = new Date();
+  
+  // Initialize sensitivityReasons if not exists
+  if (!this.sensitivityReasons) {
+    this.sensitivityReasons = [];
+  }
   
   // Auto-set sensitivity based on price and characteristics
   const sensitiveThreshold = parseFloat(process.env.SENSITIVE_PRODUCT_PRICE_THRESHOLD) || 300;

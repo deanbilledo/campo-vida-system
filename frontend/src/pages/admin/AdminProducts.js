@@ -80,20 +80,27 @@ const AdminProducts = () => {
   };
 
   const handleImageUpload = (imageUrl) => {
-    setFormData(prev => ({
-      ...prev,
-      imageUrl: imageUrl
-    }));
+    console.log('AdminProducts: handleImageUpload called with:', imageUrl);
+    setFormData(prev => {
+      const newFormData = {
+        ...prev,
+        imageUrl: imageUrl
+      };
+      console.log('AdminProducts: Updated formData:', newFormData);
+      return newFormData;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
+    console.log('AdminProducts: handleSubmit called with formData:', formData);
+
     try {
       // Validate required fields
-      if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.stock) {
-        toast.error('Please fill in all required fields');
+      if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.stock || formData.stock < 0) {
+        toast.error('Please fill in all required fields and ensure stock is not negative');
         setSubmitting(false);
         return;
       }
@@ -103,7 +110,9 @@ const AdminProducts = () => {
         description: formData.description,
         price: parseFloat(formData.price),
         category: formData.category,
-        stock: parseInt(formData.stock),
+        stock: {
+          quantity: parseInt(formData.stock)
+        },
         isActive: formData.isActive,
         isFeatured: formData.isFeatured || false,
         organicCertified: formData.isOrganic || false,
@@ -121,7 +130,10 @@ const AdminProducts = () => {
           alt: formData.name,
           isPrimary: true
         }];
+        console.log('Adding image to product data:', productData.images);
       }
+
+      console.log('Complete product data:', productData);
 
       if (editingProduct) {
         await apiClient.put(`/api/admin/products/${editingProduct._id}`, productData);
@@ -209,41 +221,57 @@ const AdminProducts = () => {
   };
 
   const tableHeaders = ['Product', 'Category', 'Price', 'Stock', 'Status', 'Organic'];
-  const tableData = products.map(product => ({
-    id: product._id,
-    product: (
-      <div className="flex items-center">
-        <div className="w-12 h-12 bg-gray-200 rounded-lg mr-4 flex items-center justify-center">
-          {product.images?.[0]?.url ? (
-            <img 
-              src={product.images[0].url.startsWith('http') ? 
-                product.images[0].url : 
-                `http://localhost:5000${product.images[0].url}`
-              } 
-              alt={product.name}
-              className="w-full h-full object-cover rounded-lg"
-            />
-          ) : (
-            <span>🌿</span>
-          )}
+  const tableData = products.map(product => {
+    // Helper function to generate image URL with cache busting
+    const getImageUrl = (imageUrl) => {
+      if (!imageUrl) return '/img/placeholder.jpg';
+      
+      if (imageUrl.startsWith('http')) {
+        return imageUrl;
+      }
+      
+      // Add cache buster to prevent stale images
+      const cacheBuster = product.lastUpdated ? `?v=${new Date(product.lastUpdated).getTime()}` : `?v=${Date.now()}`;
+      return `http://localhost:5000${imageUrl}${cacheBuster}`;
+    };
+
+    return {
+      id: product._id,
+      product: (
+        <div className="flex items-center">
+          <div className="w-12 h-12 bg-gray-200 rounded-lg mr-4 flex items-center justify-center overflow-hidden">
+            {product.images?.[0]?.url ? (
+              <img 
+                src={getImageUrl(product.images[0].url)}
+                alt={product.name}
+                className="w-full h-full object-cover rounded-lg"
+                onError={(e) => {
+                  // Fallback to placeholder if image fails to load
+                  e.target.src = '/img/placeholder.jpg';
+                }}
+              />
+            ) : (
+              <span>🌿</span>
+            )}
+          </div>
+          <div>
+            <p className="font-medium text-gray-900">{product.name}</p>
+            <p className="text-sm text-gray-500">{product.specifications?.weight?.unit || 'pieces'}</p>
+          </div>
         </div>
-        <div>
-          <p className="font-medium text-gray-900">{product.name}</p>
-          <p className="text-sm text-gray-500">{product.specifications?.weight?.unit || 'pieces'}</p>
+      ),
+      category: product.category,
+      price: formatCurrency(product.price),
+      stock: (
+        <div className="flex items-center space-x-2">
+          <span>{product.stock?.quantity || 0}</span>
+          {getStockBadge(product)}
         </div>
-      </div>
-    ),
-    category: product.category,
-    price: formatCurrency(product.price),
-    stock: (
-      <div className="flex items-center space-x-2">
-        <span>{product.stock?.quantity || 0}</span>
-        {getStockBadge(product)}
-      </div>
-    ),
-    status: getStatusBadge(product.isActive),
-    organic: product.organicCertified ? '✅' : '❌'
-  }));
+      ),
+      status: getStatusBadge(product.isActive),
+      organic: product.organicCertified ? '✅' : '❌'
+    };
+  });
 
   const tableActions = (product) => [
     <Button
@@ -371,11 +399,12 @@ const AdminProducts = () => {
 
               <div className="col-span-2">
                 <ImageUpload
+                  type="product"
                   onImageUpload={handleImageUpload}
                   currentImage={formData.imageUrl ? 
                     (formData.imageUrl.startsWith('http') ? 
                       formData.imageUrl : 
-                      `http://localhost:5000${formData.imageUrl}`
+                      `http://localhost:5000${formData.imageUrl}?v=${Date.now()}`
                     ) : ''
                   }
                   label="Product Image"

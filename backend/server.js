@@ -18,6 +18,8 @@ const adminRoutes = require('./routes/admin');
 const driverRoutes = require('./routes/driver');
 const eventRoutes = require('./routes/events');
 const uploadRoutes = require('./routes/upload');
+const postRoutes = require('./routes/posts');
+const adminPostRoutes = require('./routes/adminPosts');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -111,9 +113,15 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/driver', driverRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/admin/posts', adminPostRoutes);
 
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve frontend images
+app.use('/img', express.static(path.join(__dirname, '../frontend/public/img')));
+app.use('/images', express.static(path.join(__dirname, '../frontend/public/img')));
 
 // Serve React app in production
 if (process.env.NODE_ENV === 'production') {

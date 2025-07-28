@@ -485,14 +485,16 @@ exports.createProduct = async (req, res, next) => {
     // Handle images from frontend (array format)
     if (req.body.images && Array.isArray(req.body.images) && req.body.images.length > 0) {
       productData.images = req.body.images;
-    } else if (image) {
-      // Fallback for single image
+    } else if (req.body.image) {
+      // Fallback for single image URL
       productData.images = [{
-        url: image,
+        url: req.body.image,
         alt: name,
         isPrimary: true
       }];
     }
+
+    console.log('Product data before creation:', JSON.stringify(productData, null, 2));
 
     const product = await Product.create(productData);
 
@@ -523,9 +525,67 @@ exports.createProduct = async (req, res, next) => {
 // @access  Private (Admin)
 exports.updateProduct = async (req, res, next) => {
   try {
+    // Prepare update data
+    const updateData = { ...req.body, lastUpdatedBy: req.user.id };
+    
+    // Handle stock formatting consistently with createProduct
+    if (updateData.stock !== undefined) {
+      let stockData;
+      if (typeof updateData.stock === 'number' || typeof updateData.stock === 'string') {
+        const stockQuantity = parseInt(updateData.stock);
+        if (isNaN(stockQuantity) || stockQuantity < 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'Stock quantity must be a valid non-negative number'
+          });
+        }
+        stockData = {
+          quantity: stockQuantity,
+          isAvailable: stockQuantity > 0
+        };
+      } else if (typeof updateData.stock === 'object' && updateData.stock.quantity !== undefined) {
+        const stockQuantity = parseInt(updateData.stock.quantity);
+        if (isNaN(stockQuantity) || stockQuantity < 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'Stock quantity must be a valid non-negative number'
+          });
+        }
+        stockData = {
+          ...updateData.stock,
+          quantity: stockQuantity,
+          isAvailable: stockQuantity > 0
+        };
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid stock format'
+        });
+      }
+      updateData.stock = stockData;
+    }
+
+    // Handle image updates
+    if (updateData.images && Array.isArray(updateData.images) && updateData.images.length > 0) {
+      // Images array provided - use as is
+      console.log('Using images array:', updateData.images);
+    } else if (updateData.image) {
+      // Single image URL provided - convert to array format
+      updateData.images = [{
+        url: updateData.image,
+        alt: updateData.name || 'Product image',
+        isPrimary: true
+      }];
+      console.log('Converted single image to array:', updateData.images);
+      // Remove the single image field
+      delete updateData.image;
+    }
+
+    console.log('Update data before saving:', JSON.stringify(updateData, null, 2));
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, lastUpdatedBy: req.user.id },
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -542,6 +602,18 @@ exports.updateProduct = async (req, res, next) => {
       data: product
     });
   } catch (error) {
+    console.error('Product update error:', error);
+    if (error.name === 'ValidationError') {
+      const errors = {};
+      Object.keys(error.errors).forEach(key => {
+        errors[key] = error.errors[key].message;
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors
+      });
+    }
     next(error);
   }
 };

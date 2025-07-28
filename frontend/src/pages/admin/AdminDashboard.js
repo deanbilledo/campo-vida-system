@@ -202,7 +202,7 @@ const AdminDashboard = () => {
         >
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <motion.a
                 href="/admin/products"
                 className="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
@@ -239,6 +239,19 @@ const AdminDashboard = () => {
                 <div>
                   <p className="font-medium text-gray-900">Manage Events</p>
                   <p className="text-sm text-gray-600">Create and manage events</p>
+                </div>
+              </motion.a>
+
+              <motion.a
+                href="/admin/posts"
+                className="flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="text-2xl mr-3">📝</div>
+                <div>
+                  <p className="font-medium text-gray-900">Manage Posts</p>
+                  <p className="text-sm text-gray-600">Create and publish blog posts</p>
                 </div>
               </motion.a>
             </div>

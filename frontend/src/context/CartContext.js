@@ -64,7 +64,33 @@ const cartReducer = (state, action) => {
           id: product._id,
           name: product.name,
           price: product.price,
-          image: product.images?.[0] || '/images/placeholder.jpg',
+          image: (() => {
+            const images = product.images || [];
+            if (images.length === 0) {
+              return '/img/placeholder.jpg';
+            }
+            
+            const firstImage = images[0];
+            
+            // Handle new API format (objects with url property)
+            if (typeof firstImage === 'object' && firstImage.url) {
+              const imageUrl = firstImage.url;
+              if (imageUrl.startsWith('http')) {
+                return imageUrl;
+              }
+              return `http://localhost:5000${imageUrl}`;
+            }
+            
+            // Handle old format (direct URL strings)
+            if (typeof firstImage === 'string') {
+              if (firstImage.startsWith('http')) {
+                return firstImage;
+              }
+              return `http://localhost:5000${firstImage}`;
+            }
+            
+            return '/img/placeholder.jpg';
+          })(),
           quantity,
           maxStock: product.stock,
           category: product.category,

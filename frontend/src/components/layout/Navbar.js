@@ -50,6 +50,7 @@ const Navbar = () => {
     { name: 'Home', href: '/', current: location.pathname === '/' },
     { name: 'Products', href: '/products', current: location.pathname.startsWith('/products') },
     { name: 'Events', href: '/events', current: location.pathname.startsWith('/events') },
+    { name: 'Blog', href: '/posts', current: location.pathname.startsWith('/posts') },
     { name: 'About', href: '/about', current: location.pathname === '/about' },
     { name: 'Contact', href: '/contact', current: location.pathname === '/contact' },
   ];

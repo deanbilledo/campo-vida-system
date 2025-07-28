@@ -308,15 +308,27 @@ const Products = () => {
                       <div className="relative overflow-hidden">
                         <Link to={`/products/${product._id}`}>
                           <img
-                            src={
-                              product.images?.[0]?.url 
-                                ? (product.images[0].url.startsWith('http') 
-                                    ? product.images[0].url 
-                                    : `http://localhost:5000${product.images[0].url}`)
-                                : '/img/placeholder.jpg'
-                            }
+                            src={(() => {
+                              if (!product.images?.[0]?.url) {
+                                return '/img/placeholder.jpg';
+                              }
+                              
+                              const imageUrl = product.images[0].url;
+                              if (imageUrl.startsWith('http')) {
+                                return imageUrl;
+                              }
+                              
+                              // Add cache buster for uploaded images
+                              const cacheBuster = product.lastUpdated ? 
+                                `?v=${new Date(product.lastUpdated).getTime()}` : 
+                                `?v=${Date.now()}`;
+                              return `http://localhost:5000${imageUrl}${cacheBuster}`;
+                            })()}
                             alt={product.name}
                             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              e.target.src = '/img/placeholder.jpg';
+                            }}
                           />
                         </Link>
                         

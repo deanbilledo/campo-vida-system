@@ -3,10 +3,31 @@ import { Button } from './Components';
 import apiClient from '../../services/api';
 import toast from 'react-hot-toast';
 
-const ImageUpload = ({ onImageUpload, currentImage = '', label = "Product Image" }) => {
+const ImageUpload = ({ onImageUpload, currentImage = '', label = "Image", type = "product" }) => {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(currentImage);
   const [selectedFile, setSelectedFile] = useState(null);
+
+  // Get validation limits based on type
+  const getValidation = () => {
+    switch (type) {
+      case 'post':
+        return {
+          maxSize: 10 * 1024 * 1024, // 10MB for posts
+          maxSizeText: '10MB',
+          endpoint: '/api/upload/post'
+        };
+      case 'product':
+      default:
+        return {
+          maxSize: 5 * 1024 * 1024, // 5MB for products
+          maxSizeText: '5MB',
+          endpoint: '/api/upload/product'
+        };
+    }
+  };
+
+  const validation = getValidation();
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -16,12 +37,14 @@ const ImageUpload = ({ onImageUpload, currentImage = '', label = "Product Image"
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       toast.error('Please select a valid image file (JPEG, PNG, GIF, WebP)');
+      e.target.value = '';
       return;
     }
 
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size must be less than 5MB');
+    // Validate file size based on type
+    if (file.size > validation.maxSize) {
+      toast.error(`Image size must be less than ${validation.maxSizeText}`);
+      e.target.value = '';
       return;
     }
 
@@ -31,22 +54,29 @@ const ImageUpload = ({ onImageUpload, currentImage = '', label = "Product Image"
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
+      // Auto-upload the file after preview is ready
+      console.log('ImageUpload: Auto-uploading file:', file.name);
+      setTimeout(() => {
+        handleUpload(file);
+      }, 100);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
+  const handleUpload = async (fileToUpload = null) => {
+    const file = fileToUpload || selectedFile;
+    if (!file) {
       toast.error('Please select an image first');
       return;
     }
 
+    console.log('ImageUpload: Starting upload for file:', file.name);
     setUploading(true);
     const formData = new FormData();
-    formData.append('image', selectedFile);
+    formData.append('image', file);
 
     try {
-      const response = await apiClient.post('/api/upload/product', formData, {
+      const response = await apiClient.post(validation.endpoint, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -54,15 +84,27 @@ const ImageUpload = ({ onImageUpload, currentImage = '', label = "Product Image"
 
       if (response.data.success) {
         const imageUrl = response.data.data.url;
+        console.log('ImageUpload: Upload successful, imageUrl:', imageUrl);
+        console.log('ImageUpload: Calling onImageUpload with:', imageUrl);
         setPreview(`http://localhost:5000${imageUrl}`);
         onImageUpload(imageUrl);
-        toast.success('Image uploaded successfully!');
+        toast.success(response.data.message || 'Image uploaded successfully!');
         setSelectedFile(null);
+        
+        // Clear the file input
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) fileInput.value = '';
       }
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error(error.response?.data?.message || 'Failed to upload image');
+      const errorMessage = error.response?.data?.message || 'Failed to upload image';
+      toast.error(errorMessage);
       setPreview(currentImage);
+      setSelectedFile(null);
+      
+      // Clear the file input
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = '';
     } finally {
       setUploading(false);
     }
@@ -89,16 +131,11 @@ const ImageUpload = ({ onImageUpload, currentImage = '', label = "Product Image"
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
         />
         
-        {selectedFile && (
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleUpload}
-            loading={uploading}
-            disabled={uploading}
-          >
-            {uploading ? 'Uploading...' : 'Upload'}
-          </Button>
+        {uploading && (
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500"></div>
+            <span>Uploading...</span>
+          </div>
         )}
       </div>
 
@@ -136,7 +173,7 @@ const ImageUpload = ({ onImageUpload, currentImage = '', label = "Product Image"
 
       {/* Upload Instructions */}
       <p className="text-xs text-gray-500">
-        Supported formats: JPEG, PNG, GIF, WebP. Max size: 5MB
+        Supported formats: JPEG, PNG, GIF, WebP. Max size: {validation.maxSizeText}
       </p>
     </div>
   );

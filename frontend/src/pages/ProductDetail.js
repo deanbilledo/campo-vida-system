@@ -124,14 +124,28 @@ const ProductDetail = () => {
   ];
 
   useEffect(() => {
-    // Simulate API call
     const fetchProduct = async () => {
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setProduct(mockProduct);
-      setReviews(mockReviews);
-      setRelatedProducts(mockRelatedProducts);
-      setLoading(false);
+      try {
+        const response = await fetch(`http://localhost:5000/api/products/${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProduct(data.data);
+        } else {
+          // Fallback to mock data if API fails
+          setProduct(mockProduct);
+        }
+        setReviews(mockReviews);
+        setRelatedProducts(mockRelatedProducts);
+      } catch (error) {
+        console.error('Error fetching product:', error);
+        // Fallback to mock data
+        setProduct(mockProduct);
+        setReviews(mockReviews);
+        setRelatedProducts(mockRelatedProducts);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProduct();
@@ -266,9 +280,41 @@ const ProductDetail = () => {
               {/* Main Image */}
               <div className="relative aspect-square">
                 <img
-                  src={product.images[selectedImageIndex]}
+                  src={(() => {
+                    const images = product.images || [];
+                    if (images.length === 0) {
+                      return '/img/placeholder.jpg';
+                    }
+                    
+                    const currentImage = images[selectedImageIndex];
+                    
+                    // Handle new API format (objects with url property)
+                    if (typeof currentImage === 'object' && currentImage.url) {
+                      const imageUrl = currentImage.url;
+                      if (imageUrl.startsWith('http')) {
+                        return imageUrl;
+                      }
+                      const cacheBuster = product.lastUpdated ? 
+                        `?v=${new Date(product.lastUpdated).getTime()}` : 
+                        `?v=${Date.now()}`;
+                      return `http://localhost:5000${imageUrl}${cacheBuster}`;
+                    }
+                    
+                    // Handle old format (direct URL strings) or placeholder
+                    if (typeof currentImage === 'string') {
+                      if (currentImage.startsWith('http') || currentImage.startsWith('/api/placeholder')) {
+                        return currentImage;
+                      }
+                      return `http://localhost:5000${currentImage}`;
+                    }
+                    
+                    return '/img/placeholder.jpg';
+                  })()}
                   alt={product.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = '/img/placeholder.jpg';
+                  }}
                 />
                 
                 {/* Image Navigation */}
@@ -328,26 +374,55 @@ const ProductDetail = () => {
               </div>
 
               {/* Image Thumbnails */}
-              {product.images.length > 1 && (
+              {product.images && product.images.length > 1 && (
                 <div className="p-4">
                   <div className="flex space-x-2 overflow-x-auto">
-                    {product.images.map((image, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
-                          selectedImageIndex === index
-                            ? 'border-primary-500'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <img
-                          src={image}
-                          alt={`${product.name} ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
+                    {product.images.map((image, index) => {
+                      const getThumbUrl = (img) => {
+                        // Handle new API format (objects with url property)
+                        if (typeof img === 'object' && img.url) {
+                          const imageUrl = img.url;
+                          if (imageUrl.startsWith('http')) {
+                            return imageUrl;
+                          }
+                          const cacheBuster = product.lastUpdated ? 
+                            `?v=${new Date(product.lastUpdated).getTime()}` : 
+                            `?v=${Date.now()}`;
+                          return `http://localhost:5000${imageUrl}${cacheBuster}`;
+                        }
+                        
+                        // Handle old format (direct URL strings) or placeholder
+                        if (typeof img === 'string') {
+                          if (img.startsWith('http') || img.startsWith('/api/placeholder')) {
+                            return img;
+                          }
+                          return `http://localhost:5000${img}`;
+                        }
+                        
+                        return '/img/placeholder.jpg';
+                      };
+
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedImageIndex(index)}
+                          className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
+                            selectedImageIndex === index
+                              ? 'border-primary-500'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <img
+                            src={getThumbUrl(image)}
+                            alt={`${product.name} ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.src = '/img/placeholder.jpg';
+                            }}
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
