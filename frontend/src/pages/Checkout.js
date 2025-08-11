@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -41,10 +41,13 @@ const checkoutSchema = yup.object({
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const { cartItems, cartTotal, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedDeliveryTime, setSelectedDeliveryTime] = useState('');
+  const [codEligible, setCodEligible] = useState(false);
+  const [fromBuyNow, setFromBuyNow] = useState(false);
 
   // Redirect if not authenticated or cart is empty
   useEffect(() => {

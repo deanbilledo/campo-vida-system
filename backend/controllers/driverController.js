@@ -499,3 +499,230 @@ exports.getEarnings = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Add delivery proof of delivery
+// @route   POST /api/driver/deliveries/:id/proof
+// @access  Private (Driver)
+exports.addDeliveryProof = async (req, res, next) => {
+  try {
+    const driverId = req.user.id;
+    const { photo, signature, recipientName, notes } = req.body;
+
+    const order = await Order.findOne({
+      _id: req.params.id,
+      'driver.assignedDriver': driverId,
+      status: 'out_for_delivery'
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Delivery not found or not available for proof submission'
+      });
+    }
+
+    // Add proof of delivery
+    const deliveryAttempt = {
+      attemptNumber: order.driver.deliveryAttempts.length + 1,
+      timestamp: new Date(),
+      status: 'successful',
+      notes: notes || '',
+      proofOfDelivery: {
+        photo: photo || '',
+        signature: signature || '',
+        recipientName: recipientName || ''
+      }
+    };
+
+    order.driver.deliveryAttempts.push(deliveryAttempt);
+    order.status = 'delivered';
+    order.driver.actualArrival = new Date();
+
+    // If COD, mark payment as collected
+    if (order.payment.method === 'cod') {
+      order.payment.status = 'paid';
+      order.payment.codDetails = {
+        amountCollected: order.summary.totalAmount,
+        collectedBy: driverId,
+        collectedAt: new Date()
+      };
+    }
+
+    await order.save();
+
+    // Send notification email
+    try {
+      await sendOrderStatusUpdateEmail(order, order.customer, 'delivered');
+    } catch (emailError) {
+      console.error('Delivery confirmation email failed:', emailError);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Delivery proof submitted successfully',
+      data: order
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update driver availability
+// @route   PUT /api/driver/availability
+// @access  Private (Driver)
+exports.updateAvailability = async (req, res, next) => {
+  try {
+    const driverId = req.user.id;
+    const { isAvailable, location } = req.body;
+
+    const driver = await User.findById(driverId);
+    if (!driver) {
+      return res.status(404).json({
+        success: false,
+        message: 'Driver not found'
+      });
+    }
+
+    // Update availability
+    driver.driverProfile = driver.driverProfile || {};
+    driver.driverProfile.isAvailable = isAvailable;
+    driver.driverProfile.lastLocationUpdate = new Date();
+
+    if (location) {
+      driver.driverProfile.currentLocation = {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        address: location.address || ''
+      };
+    }
+
+    await driver.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Availability updated successfully',
+      data: {
+        isAvailable: driver.driverProfile.isAvailable,
+        location: driver.driverProfile.currentLocation
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get driver performance statistics
+// @route   GET /api/driver/performance
+// @access  Private (Driver)
+exports.getPerformanceStats = async (req, res, next) => {
+  try {
+    const driverId = req.user.id;
+    const { period = 'month' } = req.query;
+
+    let dateFilter = {};
+    switch (period) {
+      case 'today':
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateFilter.createdAt = { $gte: today, $lt: tomorrow };
+        break;
+      case 'week':
+        dateFilter.createdAt = { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) };
+        break;
+      case 'month':
+        dateFilter.createdAt = { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) };
+        break;
+    }
+
+    const [performanceStats, averageRating] = await Promise.all([
+      Order.aggregate([
+        { 
+          $match: { 
+            'driver.assignedDriver': driverId,
+            ...dateFilter
+          }
+        },
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 },
+            totalAmount: { $sum: '$summary.totalAmount' },
+            avgDeliveryTime: {
+              $avg: {
+                $cond: [
+                  { $and: [
+                    { $ne: ['$driver.actualArrival', null] },
+                    { $ne: ['$driver.estimatedArrival', null] }
+                  ]},
+                  {
+                    $divide: [
+                      { $subtract: ['$driver.actualArrival', '$driver.estimatedArrival'] },
+                      1000 * 60 // Convert to minutes
+                    ]
+                  },
+                  null
+                ]
+              }
+            }
+          }
+        }
+      ]),
+      
+      // Get average rating (if rating system exists)
+      Order.aggregate([
+        { 
+          $match: { 
+            'driver.assignedDriver': driverId,
+            'feedback.driverRating': { $exists: true },
+            ...dateFilter
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            averageRating: { $avg: '$feedback.driverRating' },
+            totalRatings: { $sum: 1 }
+          }
+        }
+      ])
+    ]);
+
+    // Process performance data
+    const stats = {};
+    let totalDeliveries = 0;
+    
+    performanceStats.forEach(stat => {
+      stats[stat._id] = stat;
+      totalDeliveries += stat.count;
+    });
+
+    const onTimePercentage = stats.delivered ? 
+      Math.round(((stats.delivered.count - Math.max(0, stats.delivered.avgDeliveryTime || 0)) / stats.delivered.count) * 100) : 
+      0;
+
+    const successRate = totalDeliveries > 0 ? 
+      Math.round(((stats.delivered?.count || 0) / totalDeliveries) * 100) : 
+      0;
+
+    const ratingData = averageRating[0] || { averageRating: 0, totalRatings: 0 };
+
+    res.status(200).json({
+      success: true,
+      period,
+      data: {
+        totalDeliveries,
+        deliveredCount: stats.delivered?.count || 0,
+        failedCount: stats.failed?.count || 0,
+        successRate,
+        onTimePercentage,
+        averageRating: ratingData.averageRating ? Math.round(ratingData.averageRating * 10) / 10 : 0,
+        totalRatings: ratingData.totalRatings,
+        totalRevenue: Object.values(stats).reduce((sum, stat) => sum + stat.totalAmount, 0)
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};

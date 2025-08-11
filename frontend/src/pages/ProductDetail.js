@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  StarIcon,
   HeartIcon,
   ShoppingCartIcon,
+  ShoppingBagIcon,
   TruckIcon,
   CheckCircleIcon,
-  InformationCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ShareIcon,
@@ -24,17 +23,10 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
-  const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [reviews, setReviews] = useState([]);
-  const [relatedProducts, setRelatedProducts] = useState([]);
-
+  
   // Mock product data (would come from API)
   const mockProduct = {
-    id: parseInt(id),
+    id: parseInt(id) || 1,
     name: 'Fresh Organic Tomatoes',
     price: 85.00,
     originalPrice: 95.00,
@@ -43,34 +35,37 @@ const ProductDetail = () => {
     unit: 'kg',
     stock: 25,
     images: [
-      '/api/placeholder/500/500',
-      '/api/placeholder/500/500',
-      '/api/placeholder/500/500',
-      '/api/placeholder/500/500',
+      '/img/placeholder.jpg',
+      '/img/placeholder.jpg'
     ],
     rating: 4.8,
-    reviewCount: 124,
-    origin: 'Benguet, Philippines',
-    harvestDate: '2024-01-15',
-    nutritionalInfo: {
-      calories: '18 per 100g',
-      vitamin_c: '28mg',
-      potassium: '237mg',
-      fiber: '1.2g',
-    },
+    reviewCount: 324,
+    inStock: true,
     features: [
-      'Organically grown without pesticides',
-      'Harvested within 24 hours',
-      'Rich in lycopene and vitamins',
-      'Supports local farmers',
+      'Grown without pesticides',
+      'Rich in vitamins A and C',
+      'Perfect for salads and cooking',
+      'Harvested at peak ripeness'
     ],
-    storage: 'Store in a cool, dry place. Refrigerate for longer freshness.',
-    seller: {
-      name: 'Green Valley Farm',
-      rating: 4.9,
-      location: 'La Trinidad, Benguet',
+    nutritionalInfo: {
+      calories: '18 kcal',
+      protein: '0.9g',
+      fiber: '1.2g',
+      vitamin_c: '13.7mg'
     },
+    origin: 'Benguet, Philippines',
+    harvestDate: 'January 2025',
+    seller: {
+      name: 'Campo Vida Farms'
+    }
   };
+
+  const [product, setProduct] = useState(mockProduct);
+  const [quantity, setQuantity] = useState(1);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   const mockReviews = [
     {
@@ -135,13 +130,11 @@ const ProductDetail = () => {
           // Fallback to mock data if API fails
           setProduct(mockProduct);
         }
-        setReviews(mockReviews);
         setRelatedProducts(mockRelatedProducts);
       } catch (error) {
         console.error('Error fetching product:', error);
         // Fallback to mock data
         setProduct(mockProduct);
-        setReviews(mockReviews);
         setRelatedProducts(mockRelatedProducts);
       } finally {
         setLoading(false);
@@ -152,6 +145,11 @@ const ProductDetail = () => {
   }, [id]);
 
   const handleAddToCart = () => {
+    if (!product) {
+      toast.error('Product not loaded');
+      return;
+    }
+
     if (!isAuthenticated) {
       toast.error('Please login to add items to cart');
       navigate('/login');
@@ -159,16 +157,16 @@ const ProductDetail = () => {
     }
 
     addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.images[0],
-      unit: product.unit,
-      category: product.category,
-      stock: product.stock,
+      id: product?.id || 1,
+      name: product?.name || 'Product',
+      price: product?.price || 0,
+      image: product?.images?.[0] || '/img/placeholder.jpg',
+      unit: product?.unit || 'unit',
+      category: product?.category || 'General',
+      stock: product?.stock || 0,
     }, quantity);
 
-    toast.success(`Added ${quantity} ${product.unit} of ${product.name} to cart`);
+    toast.success(`Added ${quantity} ${product?.unit || 'unit'} of ${product?.name || 'product'} to cart`);
   };
 
   const handleWishlist = () => {
@@ -183,11 +181,13 @@ const ProductDetail = () => {
   };
 
   const handleShare = async () => {
+    if (!product) return;
+    
     if (navigator.share) {
       try {
         await navigator.share({
-          title: product.name,
-          text: product.description,
+          title: product?.name || 'Campo Vida Product',
+          text: product?.description || 'Check out this product from Campo Vida',
           url: window.location.href,
         });
       } catch (error) {
@@ -198,6 +198,107 @@ const ProductDetail = () => {
       navigator.clipboard.writeText(window.location.href);
       toast.success('Product link copied to clipboard!');
     }
+  };
+
+  const handleBuyNow = async () => {
+    if (!product) {
+      toast.error('Product not available');
+      return;
+    }
+
+    if (!isAuthenticated) {
+      toast.error('Please login to make a purchase');
+      navigate('/login');
+      return;
+    }
+
+    // Check user's order history and COD eligibility
+    try {
+      const response = await fetch('http://localhost:5000/api/orders/user-orders', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const completedOrders = data.orders?.filter(order => order.status === 'delivered') || [];
+        const isCodEligible = completedOrders.length >= 5;
+        
+        // Show guidance for new users
+        if (completedOrders.length === 0) {
+          toast((t) => (
+            <div className="space-y-2">
+              <div className="font-semibold text-yellow-600">First Time Buyer Guidance</div>
+              <div className="text-sm text-gray-600">
+                Welcome to Campo Vida! For your first purchase, you'll need to pay online.
+                After 5 successful orders, you'll unlock Cash on Delivery (COD) option.
+              </div>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  proceedToBuyNow(false); // false = no COD available
+                }}
+                className="bg-primary-600 text-white px-4 py-2 rounded text-sm hover:bg-primary-700"
+              >
+                Continue to Purchase
+              </button>
+            </div>
+          ), { duration: 8000 });
+          return;
+        } else if (completedOrders.length < 5) {
+          toast((t) => (
+            <div className="space-y-2">
+              <div className="font-semibold text-blue-600">Order Progress</div>
+              <div className="text-sm text-gray-600">
+                You've completed {completedOrders.length}/5 orders. 
+                {5 - completedOrders.length} more orders to unlock COD option.
+              </div>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  proceedToBuyNow(false);
+                }}
+                className="bg-primary-600 text-white px-4 py-2 rounded text-sm hover:bg-primary-700"
+              >
+                Continue to Purchase
+              </button>
+            </div>
+          ), { duration: 6000 });
+          return;
+        }
+        
+        // User is COD eligible
+        proceedToBuyNow(isCodEligible);
+      } else {
+        // Fallback for API error
+        proceedToBuyNow(false);
+      }
+    } catch (error) {
+      console.error('Error checking order history:', error);
+      proceedToBuyNow(false);
+    }
+  };
+
+  const proceedToBuyNow = (codAvailable) => {
+    // Add item to cart first
+    addToCart({
+      id: product?.id || 1,
+      name: product?.name || 'Product',
+      price: product?.price || 0,
+      image: product?.images?.[0] || '/img/placeholder.jpg',
+      unit: product?.unit || 'unit',
+      category: product?.category || 'General',
+      stock: product?.stock || 0,
+    }, quantity);
+
+    // Navigate to checkout with COD eligibility info
+    navigate('/checkout', { 
+      state: { 
+        codEligible: codAvailable,
+        fromBuyNow: true 
+      } 
+    });
   };
 
   const containerVariants = {
@@ -264,12 +365,12 @@ const ProductDetail = () => {
             </li>
             <li>/</li>
             <li>
-              <button onClick={() => navigate(`/products?category=${product.category}`)} className="hover:text-primary-600">
-                {product.category}
+              <button onClick={() => navigate(`/products?category=${product?.category || ''}`)} className="hover:text-primary-600">
+                {product?.category || 'Category'}
               </button>
             </li>
             <li>/</li>
-            <li className="text-gray-900 font-medium">{product.name}</li>
+            <li className="text-gray-900 font-medium">{product?.name || 'Product'}</li>
           </ol>
         </motion.nav>
 
@@ -281,7 +382,7 @@ const ProductDetail = () => {
               <div className="relative aspect-square">
                 <img
                   src={(() => {
-                    const images = product.images || [];
+                    const images = product?.images || [];
                     if (images.length === 0) {
                       return '/img/placeholder.jpg';
                     }
@@ -289,12 +390,12 @@ const ProductDetail = () => {
                     const currentImage = images[selectedImageIndex];
                     
                     // Handle new API format (objects with url property)
-                    if (typeof currentImage === 'object' && currentImage.url) {
+                    if (typeof currentImage === 'object' && currentImage?.url) {
                       const imageUrl = currentImage.url;
                       if (imageUrl.startsWith('http')) {
                         return imageUrl;
                       }
-                      const cacheBuster = product.lastUpdated ? 
+                      const cacheBuster = product?.lastUpdated ? 
                         `?v=${new Date(product.lastUpdated).getTime()}` : 
                         `?v=${Date.now()}`;
                       return `http://localhost:5000${imageUrl}${cacheBuster}`;
@@ -310,7 +411,7 @@ const ProductDetail = () => {
                     
                     return '/img/placeholder.jpg';
                   })()}
-                  alt={product.name}
+                  alt={product?.name || 'Product image'}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.src = '/img/placeholder.jpg';
@@ -318,11 +419,11 @@ const ProductDetail = () => {
                 />
                 
                 {/* Image Navigation */}
-                {product.images.length > 1 && (
+                {product?.images?.length > 1 && (
                   <>
                     <button
                       onClick={() => setSelectedImageIndex((prev) => 
-                        prev === 0 ? product.images.length - 1 : prev - 1
+                        prev === 0 ? (product?.images?.length || 1) - 1 : prev - 1
                       )}
                       className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
                     >
@@ -330,7 +431,7 @@ const ProductDetail = () => {
                     </button>
                     <button
                       onClick={() => setSelectedImageIndex((prev) => 
-                        prev === product.images.length - 1 ? 0 : prev + 1
+                        prev === (product?.images?.length || 1) - 1 ? 0 : prev + 1
                       )}
                       className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
                     >
@@ -341,9 +442,9 @@ const ProductDetail = () => {
 
                 {/* Stock Badge */}
                 <div className="absolute top-4 left-4">
-                  {product.stock > 0 ? (
+                  {(product?.stock || 0) > 0 ? (
                     <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      In Stock ({product.stock} {product.unit} available)
+                      In Stock ({product?.stock || 0} {product?.unit || 'unit'} available)
                     </span>
                   ) : (
                     <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
@@ -374,18 +475,18 @@ const ProductDetail = () => {
               </div>
 
               {/* Image Thumbnails */}
-              {product.images && product.images.length > 1 && (
+              {product?.images && product?.images.length > 1 && (
                 <div className="p-4">
                   <div className="flex space-x-2 overflow-x-auto">
-                    {product.images.map((image, index) => {
+                    {product?.images?.map((image, index) => {
                       const getThumbUrl = (img) => {
                         // Handle new API format (objects with url property)
-                        if (typeof img === 'object' && img.url) {
+                        if (typeof img === 'object' && img?.url) {
                           const imageUrl = img.url;
                           if (imageUrl.startsWith('http')) {
                             return imageUrl;
                           }
-                          const cacheBuster = product.lastUpdated ? 
+                          const cacheBuster = product?.lastUpdated ? 
                             `?v=${new Date(product.lastUpdated).getTime()}` : 
                             `?v=${Date.now()}`;
                           return `http://localhost:5000${imageUrl}${cacheBuster}`;
@@ -414,7 +515,7 @@ const ProductDetail = () => {
                         >
                           <img
                             src={getThumbUrl(image)}
-                            alt={`${product.name} ${index + 1}`}
+                            alt={`${product?.name || 'Product'} ${index + 1}`}
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               e.target.src = '/img/placeholder.jpg';
@@ -434,7 +535,7 @@ const ProductDetail = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               {/* Basic Info */}
               <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{product?.name || 'Loading...'}</h1>
                 
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="flex items-center">
@@ -442,14 +543,14 @@ const ProductDetail = () => {
                       <StarSolidIcon
                         key={i}
                         className={`w-5 h-5 ${
-                          i < Math.floor(product.rating)
+                          i < Math.floor(product?.rating || 0)
                             ? 'text-yellow-400'
                             : 'text-gray-300'
                         }`}
                       />
                     ))}
                     <span className="ml-2 text-sm text-gray-600">
-                      {product.rating} ({product.reviewCount} reviews)
+                      {product?.rating || 0} ({product?.reviewCount || 0} reviews)
                     </span>
                   </div>
                 </div>
@@ -457,18 +558,18 @@ const ProductDetail = () => {
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="flex items-center">
                     <span className="text-3xl font-bold text-primary-600">
-                      ₱{product.price.toFixed(2)}
+                      ₱{product?.price?.toFixed(2) || '0.00'}
                     </span>
-                    <span className="text-lg text-gray-500 ml-2">per {product.unit}</span>
+                    <span className="text-lg text-gray-500 ml-2">per {product?.unit || 'unit'}</span>
                   </div>
-                  {product.originalPrice && product.originalPrice > product.price && (
+                  {product?.originalPrice && (product?.originalPrice || 0) > (product?.price || 0) && (
                     <span className="text-lg text-gray-500 line-through">
-                      ₱{product.originalPrice.toFixed(2)}
+                      ₱{(product?.originalPrice || 0).toFixed(2)}
                     </span>
                   )}
                 </div>
 
-                <p className="text-gray-700 leading-relaxed">{product.description}</p>
+                <p className="text-gray-700 leading-relaxed">{product?.description || 'No description available'}</p>
               </div>
 
               {/* Quantity and Add to Cart */}
@@ -476,7 +577,7 @@ const ProductDetail = () => {
                 <div className="flex items-center space-x-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Quantity ({product.unit})
+                      Quantity ({product?.unit || 'unit'})
                     </label>
                     <div className="flex items-center space-x-3">
                       <button
@@ -487,9 +588,9 @@ const ProductDetail = () => {
                       </button>
                       <span className="text-lg font-medium px-4">{quantity}</span>
                       <button
-                        onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                        onClick={() => setQuantity(Math.min(product?.stock || 0, quantity + 1))}
                         className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                        disabled={quantity >= product.stock}
+                        disabled={quantity >= (product?.stock || 0)}
                       >
                         +
                       </button>
@@ -501,21 +602,34 @@ const ProductDetail = () => {
                       Total Price
                     </label>
                     <div className="text-2xl font-bold text-primary-600">
-                      ₱{(product.price * quantity).toFixed(2)}
+                      ₱{((product?.price || 0) * quantity).toFixed(2)}
                     </div>
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleAddToCart}
-                  variant="primary"
-                  size="lg"
-                  fullWidth
-                  disabled={product.stock === 0}
-                  leftIcon={<ShoppingCartIcon className="w-5 h-5" />}
-                >
-                  {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    onClick={handleBuyNow}
+                    variant="primary"
+                    size="lg"
+                    fullWidth
+                    disabled={(product?.stock || 0) === 0}
+                    leftIcon={<ShoppingBagIcon className="w-5 h-5" />}
+                  >
+                    {(product?.stock || 0) === 0 ? 'Out of Stock' : 'Buy Now'}
+                  </Button>
+                  
+                  <Button
+                    onClick={handleAddToCart}
+                    variant="outline"
+                    size="lg"
+                    fullWidth
+                    disabled={(product?.stock || 0) === 0}
+                    leftIcon={<ShoppingCartIcon className="w-5 h-5" />}
+                  >
+                    {(product?.stock || 0) === 0 ? 'Out of Stock' : 'Add to Cart'}
+                  </Button>
+                </div>
               </div>
 
               {/* Product Details */}
@@ -523,19 +637,19 @@ const ProductDetail = () => {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium text-gray-700">Origin:</span>
-                    <span className="ml-2 text-gray-600">{product.origin}</span>
+                    <span className="ml-2 text-gray-600">{product?.origin || 'N/A'}</span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Harvest Date:</span>
-                    <span className="ml-2 text-gray-600">{product.harvestDate}</span>
+                    <span className="ml-2 text-gray-600">{product?.harvestDate || 'N/A'}</span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Category:</span>
-                    <span className="ml-2 text-gray-600">{product.category}</span>
+                    <span className="ml-2 text-gray-600">{product?.category || 'N/A'}</span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Seller:</span>
-                    <span className="ml-2 text-gray-600">{product.seller.name}</span>
+                    <span className="ml-2 text-gray-600">{product?.seller?.name || 'N/A'}</span>
                   </div>
                 </div>
 
@@ -543,7 +657,7 @@ const ProductDetail = () => {
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Key Features:</h3>
                   <ul className="space-y-1">
-                    {product.features.map((feature, index) => (
+                    {(product?.features || []).map((feature, index) => (
                       <li key={index} className="flex items-center text-sm text-gray-600">
                         <CheckCircleIcon className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
                         {feature}
@@ -578,7 +692,7 @@ const ProductDetail = () => {
                   Nutritional Information
                 </button>
                 <button className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">
-                  Reviews ({product.reviewCount})
+                  Reviews ({product?.reviewCount || 0})
                 </button>
                 <button className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">
                   Storage Instructions
@@ -589,7 +703,7 @@ const ProductDetail = () => {
             <div className="p-6">
               {/* Nutritional Information */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries(product.nutritionalInfo).map(([key, value]) => (
+                {Object.entries(product?.nutritionalInfo || {}).map(([key, value]) => (
                   <div key={key} className="text-center p-4 bg-gray-50 rounded-lg">
                     <div className="text-lg font-semibold text-gray-900">{value}</div>
                     <div className="text-sm text-gray-600 capitalize">
@@ -608,26 +722,26 @@ const ProductDetail = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {relatedProducts.map((relatedProduct) => (
               <div
-                key={relatedProduct.id}
+                key={relatedProduct?.id || Math.random()}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/products/${relatedProduct.id}`)}
+                onClick={() => navigate(`/products/${relatedProduct?.id || 1}`)}
               >
                 <div className="aspect-square">
                   <img
-                    src={relatedProduct.image}
-                    alt={relatedProduct.name}
+                    src={relatedProduct?.image || '/img/placeholder.jpg'}
+                    alt={relatedProduct?.name || 'Related product'}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2">{relatedProduct.name}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">{relatedProduct?.name || 'Product'}</h3>
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-bold text-primary-600">
-                      ₱{relatedProduct.price.toFixed(2)}
+                      ₱{(relatedProduct?.price || 0).toFixed(2)}
                     </span>
                     <div className="flex items-center">
                       <StarSolidIcon className="w-4 h-4 text-yellow-400" />
-                      <span className="ml-1 text-sm text-gray-600">{relatedProduct.rating}</span>
+                      <span className="ml-1 text-sm text-gray-600">{relatedProduct?.rating || 0}</span>
                     </div>
                   </div>
                 </div>
