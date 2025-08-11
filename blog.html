@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Campo Vida</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: "#2d5016",
+                            50: "#f0f9e8",
+                            100: "#d9f0c5",
+                            200: "#b8e18e",
+                            300: "#94d051",
+                            400: "#73ba28",
+                            500: "#5a9e1a",
+                            600: "#4a8414",
+                            700: "#3d6b11",
+                            800: "#2d5016",
+                            900: "#1e3509",
+                            950: "#0f1c04"
+                        },
+                        secondary: {
+                            DEFAULT: "#8b5a2b",
+                            50: "#faf7f2",
+                            100: "#f3ede0",
+                            200: "#e6d7c0",
+                            300: "#d4bd99",
+                            400: "#c19e6f",
+                            500: "#b3855b",
+                            600: "#a6704f",
+                            700: "#8b5a2b",
+                            800: "#70482a",
+                            900: "#5a3c25",
+                            950: "#2f1e13"
+                        },
+                        accent: {
+                            DEFAULT: "#c2410c",
+                            50: "#fff7ed",
+                            100: "#ffedd5",
+                            200: "#fed7aa",
+                            300: "#fdba74",
+                            400: "#fb923c",
+                            500: "#f97316",
+                            600: "#ea580c",
+                            700: "#c2410c",
+                            800: "#9a3412",
+                            900: "#7c2d12",
+                            950: "#431407"
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'float': 'float 6s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #2d5016, #4a8414);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-pattern {
+            background-image: radial-gradient(circle at 1px 1px, rgba(45, 80, 22, 0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .category-tab.active {
+            background-color: #2d5016;
+            color: white;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="flex items-center space-x-3">
+                        <img src="frontend/public/img/campo-vida-logo.jpeg" alt="Campo Vida Logo" class="w-10 h-10 object-cover rounded-full border-2 border-primary-200" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center" style="display: none;">
+                            <span class="text-white font-bold text-sm">CV</span>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">Campo Vida</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Home</a>
+                        <a href="products.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Products</a>
+                        <a href="events.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Events</a>
+                        <a href="blog.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-primary-600 bg-primary-50 transition-colors">Blog</a>
+                        <a href="about.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">About</a>
+                        <a href="contact.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Desktop Actions -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <!-- Search -->
+                    <button id="searchBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors">
+                        <i class="fas fa-search w-5 h-5"></i>
+                    </button>
+                    
+                    <!-- Wishlist -->
+                    <button id="wishlistBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors relative">
+                        <i class="fas fa-heart w-5 h-5"></i>
+                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 scale-0 transition-all">0</span>
+                    </button>
+                    
+                    <!-- Cart -->
+                    <button id="cartBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors relative">
+                        <i class="fas fa-shopping-cart w-5 h-5"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 scale-0 transition-all">0</span>
+                    </button>
+                    
+                    <!-- User -->
+                    <button id="loginBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors">
+                        <i class="fas fa-user w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-700 p-2">
+                        <i class="fas fa-bars w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Home</a>
+                <a href="products.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Products</a>
+                <a href="events.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Events</a>
+                <a href="blog.html" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 bg-primary-50">Blog</a>
+                <a href="about.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">About</a>
+                <a href="contact.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Contact</a>
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <button id="mobileCartBtn" class="flex items-center space-x-2 text-gray-700">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Cart</span>
+                            <span id="mobileCartCount" class="bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0">0</span>
+                        </button>
+                        <button id="mobileLoginBtn" class="text-gray-700">Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Header -->
+    <section class="py-16 bg-gradient-to-br from-primary-50 via-white to-secondary-50 hero-pattern">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-gray-800">Campo Vida</span>
+                <span class="gradient-text">Blog</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Discover the latest in sustainable farming, organic living, and fresh insights from our farming community.
+            </p>
+        </div>
+    </section>
+
+    <!-- Featured Post -->
+    <section class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-8">Featured Article</h2>
+            <div id="featuredPost" class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl overflow-hidden shadow-xl">
+                <!-- Featured post will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Filters and Content -->
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Filters -->
+            <div class="flex flex-col md:flex-row gap-6 items-center justify-between mb-8">
+                <!-- Category Tabs -->
+                <div class="flex flex-wrap gap-2">
+                    <button class="category-tab active px-4 py-2 rounded-full text-sm font-medium transition-colors" data-category="all">
+                        All Posts
+                    </button>
+                    <button class="category-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 transition-colors" data-category="farming">
+                        Farming
+                    </button>
+                    <button class="category-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 transition-colors" data-category="sustainability">
+                        Sustainability
+                    </button>
+                    <button class="category-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 transition-colors" data-category="recipes">
+                        Recipes
+                    </button>
+                    <button class="category-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 transition-colors" data-category="community">
+                        Community
+                    </button>
+                    <button class="category-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 transition-colors" data-category="tips">
+                        Tips & Guides
+                    </button>
+                </div>
+
+                <!-- Search -->
+                <div class="relative">
+                    <input type="text" id="blogSearch" placeholder="Search articles..." 
+                           class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Blog Posts Grid -->
+            <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Posts will be loaded here by JavaScript -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button id="loadMoreBtn" class="bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
+                    Load More Articles
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Subscription -->
+    <section class="py-20 bg-primary-600">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Stay Updated</h2>
+            <p class="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+                Get the latest articles, farming tips, and seasonal updates delivered to your inbox.
+            </p>
+            <form id="newsletterForm" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                <input type="email" placeholder="Enter your email" required
+                       class="flex-1 px-4 py-3 rounded-lg border-none focus:ring-2 focus:ring-primary-300">
+                <button type="submit" class="bg-accent-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-700 transition-colors">
+                    Subscribe
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Article Modal -->
+    <div id="articleModal" class="modal">
+        <div class="bg-white rounded-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div id="articleModalContent">
+                <!-- Article content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Include shared components -->
+    <div id="sharedComponents"></div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            <span id="notificationText">Success!</span>
+        </div>
+    </div>
+
+    <script src="js/shared.js"></script>
+    <script src="js/blog.js"></script>
+</body>
+</html>

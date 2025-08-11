@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Campo Vida</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: "#2d5016",
+                            50: "#f0f9e8",
+                            100: "#d9f0c5",
+                            200: "#b8e18e",
+                            300: "#94d051",
+                            400: "#73ba28",
+                            500: "#5a9e1a",
+                            600: "#4a8414",
+                            700: "#3d6b11",
+                            800: "#2d5016",
+                            900: "#1e3509",
+                            950: "#0f1c04"
+                        },
+                        secondary: {
+                            DEFAULT: "#8b5a2b",
+                            50: "#faf7f2",
+                            100: "#f3ede0",
+                            200: "#e6d7c0",
+                            300: "#d4bd99",
+                            400: "#c19e6f",
+                            500: "#b3855b",
+                            600: "#a6704f",
+                            700: "#8b5a2b",
+                            800: "#70482a",
+                            900: "#5a3c25",
+                            950: "#2f1e13"
+                        },
+                        accent: {
+                            DEFAULT: "#c2410c",
+                            50: "#fff7ed",
+                            100: "#ffedd5",
+                            200: "#fed7aa",
+                            300: "#fdba74",
+                            400: "#fb923c",
+                            500: "#f97316",
+                            600: "#ea580c",
+                            700: "#c2410c",
+                            800: "#9a3412",
+                            900: "#7c2d12",
+                            950: "#431407"
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'float': 'float 6s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #2d5016, #4a8414);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-pattern {
+            background-image: radial-gradient(circle at 1px 1px, rgba(45, 80, 22, 0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="flex items-center space-x-3">
+                        <img src="frontend/public/img/campo-vida-logo.jpeg" alt="Campo Vida Logo" class="w-10 h-10 object-cover rounded-full border-2 border-primary-200" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center" style="display: none;">
+                            <span class="text-white font-bold text-sm">CV</span>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">Campo Vida</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Home</a>
+                        <a href="products.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Products</a>
+                        <a href="events.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Events</a>
+                        <a href="blog.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Blog</a>
+                        <a href="about.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">About</a>
+                        <a href="contact.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-primary-600 bg-primary-50 transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Desktop Actions -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <!-- Search -->
+                    <button id="searchBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors">
+                        <i class="fas fa-search w-5 h-5"></i>
+                    </button>
+                    
+                    <!-- Wishlist -->
+                    <button id="wishlistBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors relative">
+                        <i class="fas fa-heart w-5 h-5"></i>
+                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 scale-0 transition-all">0</span>
+                    </button>
+                    
+                    <!-- Cart -->
+                    <button id="cartBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors relative">
+                        <i class="fas fa-shopping-cart w-5 h-5"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 scale-0 transition-all">0</span>
+                    </button>
+                    
+                    <!-- User -->
+                    <button id="loginBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors">
+                        <i class="fas fa-user w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-700 p-2">
+                        <i class="fas fa-bars w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Home</a>
+                <a href="products.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Products</a>
+                <a href="events.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Events</a>
+                <a href="blog.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Blog</a>
+                <a href="about.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">About</a>
+                <a href="contact.html" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 bg-primary-50">Contact</a>
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <button id="mobileCartBtn" class="flex items-center space-x-2 text-gray-700">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Cart</span>
+                            <span id="mobileCartCount" class="bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0">0</span>
+                        </button>
+                        <button id="mobileLoginBtn" class="text-gray-700">Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contact Header -->
+    <section class="py-16 bg-gradient-to-br from-primary-50 via-white to-secondary-50 hero-pattern">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="text-gray-800">Contact</span>
+                <span class="gradient-text">Campo Vida</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                We'd love to hear from you! Whether you have questions about our products, need support with your order, or want to partner with us.
+            </p>
+        </div>
+    </section>
+
+    <!-- Contact Form & Info -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <!-- Contact Form -->
+                <div class="lg:col-span-2">
+                    <div class="bg-gray-50 rounded-xl p-8">
+                        <h2 class="text-2xl font-bold mb-6 text-gray-900">Send us a Message</h2>
+                        <form id="contactForm" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                    <input type="text" id="firstName" name="firstName" required
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                    <input type="text" id="lastName" name="lastName" required
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" id="email" name="email" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <input type="tel" id="phone" name="phone"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                                <select id="subject" name="subject" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                    <option value="">Select a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="order">Order Support</option>
+                                    <option value="products">Product Information</option>
+                                    <option value="partnership">Partnership Opportunities</option>
+                                    <option value="feedback">Feedback</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <textarea id="message" name="message" rows="5" required
+                                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                          placeholder="Tell us how we can help you..."></textarea>
+                            </div>
+                            
+                            <button type="submit" 
+                                    class="w-full bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-6 text-gray-900">Get in Touch</h2>
+                        <div class="space-y-6">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-map-marker-alt text-primary-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">Address</h3>
+                                    <p class="text-gray-600">123 Mountain View Road<br>Baguio City, Benguet<br>Philippines 2600</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-phone text-primary-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">Phone</h3>
+                                    <p class="text-gray-600">+63 912 345 6789<br>+63 2 8123 4567</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-envelope text-primary-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">Email</h3>
+                                    <p class="text-gray-600">hello@campovida.ph<br>support@campovida.ph</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clock text-primary-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">Business Hours</h3>
+                                    <p class="text-gray-600">Monday - Friday: 8:00 AM - 6:00 PM<br>Saturday: 8:00 AM - 4:00 PM<br>Sunday: Closed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-900">Follow Us</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-pink-600 rounded-lg flex items-center justify-center text-white hover:bg-pink-700 transition-colors">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-blue-400 rounded-lg flex items-center justify-center text-white hover:bg-blue-500 transition-colors">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center text-white hover:bg-green-700 transition-colors">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4 text-gray-900">Visit Our Farm</h2>
+                <p class="text-lg text-gray-600">Come and see where your fresh organic produce is grown!</p>
+            </div>
+            
+            <!-- Map Placeholder -->
+            <div class="bg-gray-300 rounded-xl h-96 flex items-center justify-center">
+                <div class="text-center">
+                    <i class="fas fa-map-marked-alt text-4xl text-gray-500 mb-4"></i>
+                    <p class="text-gray-600">Interactive Map Coming Soon</p>
+                    <p class="text-sm text-gray-500">Campo Vida Farm, Baguio City</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Frequently Asked Questions</h2>
+                <p class="text-lg text-gray-600">
+                    Quick answers to common questions about Campo Vida.
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleFAQ(1)">
+                        <h3 class="text-lg font-semibold text-gray-900">How do I place an order?</h3>
+                        <i class="fas fa-chevron-down text-gray-500 transition-transform" id="faq-icon-1"></i>
+                    </button>
+                    <div class="mt-4 text-gray-600 hidden" id="faq-content-1">
+                        You can place an order through our website by browsing our products, adding items to your cart, and proceeding to checkout. We also accept orders via phone or our social media channels.
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleFAQ(2)">
+                        <h3 class="text-lg font-semibold text-gray-900">What are your delivery areas?</h3>
+                        <i class="fas fa-chevron-down text-gray-500 transition-transform" id="faq-icon-2"></i>
+                    </button>
+                    <div class="mt-4 text-gray-600 hidden" id="faq-content-2">
+                        We currently deliver to Metro Manila, Baguio City, and surrounding provinces. Delivery schedules and fees vary by location. Contact us for specific delivery information for your area.
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleFAQ(3)">
+                        <h3 class="text-lg font-semibold text-gray-900">Are your products really organic?</h3>
+                        <i class="fas fa-chevron-down text-gray-500 transition-transform" id="faq-icon-3"></i>
+                    </button>
+                    <div class="mt-4 text-gray-600 hidden" id="faq-content-3">
+                        Yes! All our products are certified organic by the Philippine Organic Agriculture Program. We maintain strict standards throughout the growing, harvesting, and packaging process.
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleFAQ(4)">
+                        <h3 class="text-lg font-semibold text-gray-900">What payment methods do you accept?</h3>
+                        <i class="fas fa-chevron-down text-gray-500 transition-transform" id="faq-icon-4"></i>
+                    </button>
+                    <div class="mt-4 text-gray-600 hidden" id="faq-content-4">
+                        We accept cash on delivery (COD), bank transfers, GCash, PayMaya, and credit/debit cards. COD is available for customers who have completed at least 5 successful orders.
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <button class="flex items-center justify-between w-full text-left" onclick="toggleFAQ(5)">
+                        <h3 class="text-lg font-semibold text-gray-900">How fresh are your products?</h3>
+                        <i class="fas fa-chevron-down text-gray-500 transition-transform" id="faq-icon-5"></i>
+                    </button>
+                    <div class="mt-4 text-gray-600 hidden" id="faq-content-5">
+                        Our products are harvested fresh and delivered within 24-48 hours. We work directly with local farmers to ensure you receive the freshest possible produce.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Include shared components -->
+    <div id="sharedComponents"></div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            <span id="notificationText">Success!</span>
+        </div>
+    </div>
+
+    <script src="js/shared.js"></script>
+    <script>
+        // FAQ Toggle
+        function toggleFAQ(id) {
+            const content = document.getElementById(`faq-content-${id}`);
+            const icon = document.getElementById(`faq-icon-${id}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Contact Form
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Simulate form submission
+            const button = this.querySelector('button[type="submit"]');
+            const originalText = button.textContent;
+            button.textContent = 'Sending...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                // Show success notification
+                window.campoVidaApp.showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+                
+                // Reset form
+                this.reset();
+                button.textContent = originalText;
+                button.disabled = false;
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

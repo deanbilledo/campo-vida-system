@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campo Vida - Fresh Organic Produce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: "#2d5016",
+                            50: "#f0f9e8",
+                            100: "#d9f0c5",
+                            200: "#b8e18e",
+                            300: "#94d051",
+                            400: "#73ba28",
+                            500: "#5a9e1a",
+                            600: "#4a8414",
+                            700: "#3d6b11",
+                            800: "#2d5016",
+                            900: "#1e3509",
+                            950: "#0f1c04"
+                        },
+                        secondary: {
+                            DEFAULT: "#8b5a2b",
+                            50: "#faf7f2",
+                            100: "#f3ede0",
+                            200: "#e6d7c0",
+                            300: "#d4bd99",
+                            400: "#c19e6f",
+                            500: "#b3855b",
+                            600: "#a6704f",
+                            700: "#8b5a2b",
+                            800: "#70482a",
+                            900: "#5a3c25",
+                            950: "#2f1e13"
+                        },
+                        accent: {
+                            DEFAULT: "#c2410c",
+                            50: "#fff7ed",
+                            100: "#ffedd5",
+                            200: "#fed7aa",
+                            300: "#fdba74",
+                            400: "#fb923c",
+                            500: "#f97316",
+                            600: "#ea580c",
+                            700: "#c2410c",
+                            800: "#9a3412",
+                            900: "#7c2d12",
+                            950: "#431407"
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'bounce-gentle': 'bounceGentle 2s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        bounceGentle: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #2d5016, #4a8414);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-pattern {
+            background-image: radial-gradient(circle at 1px 1px, rgba(45, 80, 22, 0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .category-pill {
+            transition: all 0.2s ease;
+        }
+        .category-pill:hover {
+            transform: scale(1.05);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4a8414, #2d5016);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #3d6b11, #1e3509);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(45, 80, 22, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 smooth-scroll">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="flex items-center space-x-3">
+                        <img src="frontend/public/img/campo-vida-logo.jpeg" alt="Campo Vida Logo" class="w-10 h-10 object-cover rounded-full border-2 border-primary-200" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center" style="display: none;">
+                            <span class="text-white font-bold text-sm">CV</span>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">Campo Vida</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-primary-600 bg-primary-50 transition-colors">Home</a>
+                        <a href="products.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Products</a>
+                        <a href="events.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Events</a>
+                        <a href="blog.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Blog</a>
+                        <a href="about.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">About</a>
+                        <a href="contact.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Desktop Actions -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <!-- Search -->
+                    <button id="searchBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors">
+                        <i class="fas fa-search w-5 h-5"></i>
+                    </button>
+                    
+                    <!-- Wishlist -->
+                    <button id="wishlistBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors relative">
+                        <i class="fas fa-heart w-5 h-5"></i>
+                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 scale-0 transition-all">0</span>
+                    </button>
+                    
+                    <!-- Cart -->
+                    <button id="cartBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors relative">
+                        <i class="fas fa-shopping-cart w-5 h-5"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 scale-0 transition-all">0</span>
+                    </button>
+                    
+                    <!-- User -->
+                    <button id="loginBtn" class="text-gray-700 hover:text-primary-600 p-2 transition-colors">
+                        <i class="fas fa-user w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-700 p-2">
+                        <i class="fas fa-bars w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-200 animate-slide-up">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 bg-primary-50">Home</a>
+                <a href="products.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Products</a>
+                <a href="events.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Events</a>
+                <a href="blog.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Blog</a>
+                <a href="about.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">About</a>
+                <a href="contact.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 transition-colors">Contact</a>
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <button id="mobileCartBtn" class="flex items-center space-x-2 text-gray-700">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Cart</span>
+                            <span id="mobileCartCount" class="bg-accent-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0">0</span>
+                        </button>
+                        <button id="mobileLoginBtn" class="text-gray-700">Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 hero-pattern">
+        <div class="absolute inset-0">
+            <div class="absolute top-20 left-10 w-32 h-32 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+            <div class="absolute top-40 right-20 w-24 h-24 bg-secondary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-20 left-1/4 w-40 h-40 bg-accent-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 4s;"></div>
+        </div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Hero Content -->
+                <div class="lg:pr-12 animate-fade-in">
+                    <div class="space-y-8">
+                        <div class="space-y-4">
+                            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+                                <span class="gradient-text">Fresh</span>
+                                <br>
+                                <span class="text-gray-800">Organic</span>
+                                <br>
+                                <span class="gradient-text">Produce</span>
+                            </h1>
+                            <p class="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl">
+                                This is just the frontend prototype mo backend functions are implemented, this is just so it can be viewed for demonstration purposes.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="products.html" class="btn-primary px-8 py-4 text-white font-semibold rounded-xl text-lg shadow-lg hover:shadow-xl transform transition-all duration-300 text-center">
+                                <i class="fas fa-seedling mr-2"></i>
+                                Shop Fresh Produce
+                            </a>
+                            <a href="about.html" class="px-8 py-4 bg-white text-primary-600 font-semibold rounded-xl text-lg border-2 border-primary-200 hover:bg-primary-50 hover:border-primary-300 transition-all duration-300 text-center">
+                                <i class="fas fa-leaf mr-2"></i>
+                                Learn More
+                            </a>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="grid grid-cols-3 gap-8 pt-8 border-t border-gray-200">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-primary-600">500+</div>
+                                <div class="text-sm text-gray-600 mt-1">Happy Customers</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-primary-600">100%</div>
+                                <div class="text-sm text-gray-600 mt-1">Organic Certified</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-primary-600">24/7</div>
+                                <div class="text-sm text-gray-600 mt-1">Fresh Delivery</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Image/Gallery -->
+                <div class="relative lg:pl-12 animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="relative">
+                        <!-- Main Image -->
+                        <div class="relative overflow-hidden rounded-2xl shadow-2xl">
+                            <img id="heroMainImage" src="frontend/public/img/view-1.jpg" alt="Fresh Organic Produce" class="w-full h-96 object-cover transform hover:scale-105 transition-transform duration-700" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZyZXNoIE9yZ2FuaWMgUHJvZHVjZTwvdGV4dD48L3N2Zz4=';">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                        </div>
+
+                        <!-- Floating Cards -->
+                        <div class="absolute -top-4 -left-4 bg-white rounded-xl shadow-xl p-4 animate-bounce-gentle">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-leaf text-primary-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">100% Organic</div>
+                                    <div class="text-sm text-gray-600">Certified Fresh</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="absolute -bottom-4 -right-4 bg-white rounded-xl shadow-xl p-4 animate-bounce-gentle" style="animation-delay: 1s;">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-truck text-secondary-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Fast Delivery</div>
+                                    <div class="text-sm text-gray-600">Same Day Available</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Thumbnails -->
+                        <div class="absolute bottom-4 left-4 flex space-x-2">
+                            <button onclick="changeHeroImage('frontend/public/img/view-1.jpg')" class="hero-thumb w-12 h-12 rounded-lg overflow-hidden border-2 border-white shadow-md hover:scale-110 transition-transform active">
+                                <img src="frontend/public/img/view-1.jpg" alt="View 1" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                            </button>
+                            <button onclick="changeHeroImage('frontend/public/img/view-2.jpg')" class="hero-thumb w-12 h-12 rounded-lg overflow-hidden border-2 border-white/50 shadow-md hover:scale-110 transition-transform">
+                                <img src="frontend/public/img/view-2.jpg" alt="View 2" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                            </button>
+                            <button onclick="changeHeroImage('frontend/public/img/flower-1.jpg')" class="hero-thumb w-12 h-12 rounded-lg overflow-hidden border-2 border-white/50 shadow-md hover:scale-110 transition-transform">
+                                <img src="frontend/public/img/flower-1.jpg" alt="Flowers" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="products.html" class="text-primary-600 hover:text-primary-700 transition-colors">
+                <i class="fas fa-chevron-down text-2xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    <span class="gradient-text">Fresh Organic</span>
+                    <span class="text-gray-800">Products</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Discover our wide selection of fresh, organic produce grown sustainably by local farmers in the beautiful mountains of Baguio.
+                </p>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="mb-12 animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="max-w-2xl mx-auto flex flex-col sm:flex-row gap-4 mb-8">
+                    <div class="flex-1 relative">
+                        <input id="productSearch" type="text" placeholder="Search products..." class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <select id="sortSelect" class="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                        <option value="name">Sort by Name</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="category">Category</option>
+                    </select>
+                </div>
+
+                <!-- Product Categories -->
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button class="category-pill category-btn active px-6 py-3 rounded-full bg-primary-600 text-white font-medium shadow-lg" data-category="all">
+                        <i class="fas fa-th-large mr-2"></i>All Products
+                    </button>
+                    <button class="category-pill category-btn px-6 py-3 rounded-full bg-white text-gray-700 font-medium border-2 border-gray-200 hover:border-primary-300 hover:bg-primary-50" data-category="vegetables">
+                        <i class="fas fa-carrot mr-2"></i>Vegetables
+                    </button>
+                    <button class="category-pill category-btn px-6 py-3 rounded-full bg-white text-gray-700 font-medium border-2 border-gray-200 hover:border-primary-300 hover:bg-primary-50" data-category="fruits">
+                        <i class="fas fa-apple-alt mr-2"></i>Fruits
+                    </button>
+                    <button class="category-pill category-btn px-6 py-3 rounded-full bg-white text-gray-700 font-medium border-2 border-gray-200 hover:border-primary-300 hover:bg-primary-50" data-category="herbs">
+                        <i class="fas fa-leaf mr-2"></i>Herbs & Spices
+                    </button>
+                    <button class="category-pill category-btn px-6 py-3 rounded-full bg-white text-gray-700 font-medium border-2 border-gray-200 hover:border-primary-300 hover:bg-primary-50" data-category="dairy">
+                        <i class="fas fa-cheese mr-2"></i>Dairy
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-12 hidden">
+                <div class="inline-block w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                <p class="text-gray-500 mt-4">Loading fresh products...</p>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-fade-in" style="animation-delay: 0.2s;">
+                <!-- Products will be populated by JavaScript -->
+            </div>
+
+            <!-- No Products Found -->
+            <div id="noProductsFound" class="text-center py-12 hidden">
+                <div class="text-6xl text-gray-300 mb-4">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No products found</h3>
+                <p class="text-gray-500">Try adjusting your search or filter criteria</p>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button id="loadMoreBtn" class="hidden btn-primary px-8 py-4 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all">
+                    <i class="fas fa-plus mr-2"></i>
+                    Load More Products
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&h=400&fit=crop" alt="Farm View" class="w-full h-auto rounded-lg shadow-lg">
+                </div>
+                
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-4">About Campo Vida</h2>
+                        <p class="text-gray-600 leading-relaxed">
+                            Campo Vida is more than just an organic food company. We're a bridge connecting 
+                            passionate local farmers with families who value fresh, healthy, and sustainably 
+                            grown produce. Our journey began in the heart of Baguio, where the cool mountain 
+                            climate and rich soil create perfect conditions for organic farming.
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="text-gray-700">100+ partner farming families</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="text-gray-700">5,000+ hectares of organic farmland</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="text-gray-700">Carbon-neutral delivery system</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="text-gray-700">Direct trade ensuring fair prices</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-primary-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+                Join the Campo Vida Family
+            </h2>
+            <p class="text-lg text-primary-100 max-w-2xl mx-auto mb-8">
+                Experience the difference of truly fresh, organic produce while supporting 
+                sustainable agriculture and local communities.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="products.html" class="bg-accent-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-accent-700 transition-colors text-center">
+                    Shop Now
+                </a>
+                <a href="contact.html" class="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors text-center">
+                    Get in Touch
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    <span class="gradient-text">Farm Events</span>
+                    <span class="text-gray-800">& Activities</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Join us for farm tours, harvest festivals, and educational workshops that connect you with sustainable agriculture.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Event 1 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300">
+                    <img src="frontend/public/img/view-1.jpg" alt="Farm Tour" class="w-full h-48 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZhcm0gVG91cjwvdGV4dD48L3N2Zz4=';">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">Farm Tour</span>
+                            <span class="text-gray-500 text-sm">Dec 20, 2024</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Organic Farm Experience</h3>
+                        <p class="text-gray-600 mb-4">Visit our partner farms in Benguet and learn about sustainable farming practices. Includes lunch and product sampling.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary-600">₱500</span>
+                            <button class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors">Join Event</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event 2 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300">
+                    <img src="frontend/public/img/view-2.jpg" alt="Harvest Festival" class="w-full h-48 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkhhcnZlc3QgRmVzdGl2YWw8L3RleHQ+PC9zdmc+';">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-secondary-100 text-secondary-700 px-3 py-1 rounded-full text-sm font-medium">Festival</span>
+                            <span class="text-gray-500 text-sm">Jan 15, 2025</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Harvest Festival</h3>
+                        <p class="text-gray-600 mb-4">Celebrate the harvest season with local farmers, traditional music, organic food vendors, and family activities.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary-600">Free</span>
+                            <button class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event 3 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300">
+                    <img src="frontend/public/img/flower-1.jpg" alt="Cooking Workshop" class="w-full h-48 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNvb2tpbmcgV29ya3Nob3A8L3RleHQ+PC9zdmc+';">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm font-medium">Workshop</span>
+                            <span class="text-gray-500 text-sm">Feb 10, 2025</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Organic Cooking Workshop</h3>
+                        <p class="text-gray-600 mb-4">Learn to cook delicious, healthy meals using fresh organic ingredients with our partner chefs.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-primary-600">₱750</span>
+                            <button class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors">Reserve Spot</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog/Posts Section -->
+    <section id="posts" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    <span class="text-gray-800">Farm</span>
+                    <span class="gradient-text">Stories</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Discover stories from our partner farmers, sustainable agriculture tips, and the latest from Campo Vida.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Post 1 -->
+                <article class="bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300">
+                    <img src="frontend/public/img/path-1.jpg" alt="Sustainable Farming" class="w-full h-48 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlN1c3RhaW5hYmxlIEZhcm1pbmc8L3RleHQ+PC9zdmc+';">
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <span class="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">Sustainability</span>
+                            <span class="text-gray-500 text-sm ml-3">Dec 15, 2024</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">The Future of Sustainable Farming in Benguet</h3>
+                        <p class="text-gray-600 mb-4">Explore how our partner farmers are leading the way in environmental stewardship and organic practices...</p>
+                        <a href="blog.html?post=sustainable-farming" class="text-primary-600 hover:text-primary-700 font-medium transition-colors">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300">
+                    <img src="frontend/public/img/path-2.jpg" alt="Seasonal Produce" class="w-full h-48 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlNlYXNvbmFsIFByb2R1Y2U8L3RleHQ+PC9zdmc+';">
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <span class="bg-secondary-100 text-secondary-700 px-3 py-1 rounded-full text-sm font-medium">Seasonal</span>
+                            <span class="text-gray-500 text-sm ml-3">Dec 12, 2024</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">What's Fresh This Season</h3>
+                        <p class="text-gray-600 mb-4">Discover the best seasonal produce available now and learn how to make the most of winter harvests...</p>
+                        <a href="blog.html?post=seasonal-produce" class="text-primary-600 hover:text-primary-700 font-medium transition-colors">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Post 3 -->
+                <article class="bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300">
+                    <img src="frontend/public/img/hutt.jpg" alt="Farmer Story" class="w-full h-48 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZhcm1lciBTdG9yeTwvdGV4dD48L3N2Zz4=';">
+                    <div class="p-6">
+                        <div class="flex items-center mb-3">
+                            <span class="bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm font-medium">Farmer Story</span>
+                            <span class="text-gray-500 text-sm ml-3">Dec 10, 2024</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Meet Farmer Juan: Three Generations of Organic Farming</h3>
+                        <p class="text-gray-600 mb-4">Learn about the dedication and passion behind our produce from one of our longtime farming partners...</p>
+                        <a href="blog.html?post=farmer-juan" class="text-primary-600 hover:text-primary-700 font-medium transition-colors">Read More →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- About Content -->
+                <div class="space-y-8 animate-fade-in">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                            <span class="text-gray-800">About</span>
+                            <span class="gradient-text">Campo Vida</span>
+                        </h2>
+                        <p class="text-xl text-gray-600 leading-relaxed mb-6">
+                            Campo Vida is more than just an organic food company. We're a bridge connecting 
+                            passionate local farmers with families who value fresh, healthy, and sustainably 
+                            grown produce.
+                        </p>
+                        <p class="text-gray-600 leading-relaxed">
+                            Our journey began in the heart of Baguio, where the cool mountain climate and rich 
+                            soil create perfect conditions for organic farming. We work directly with farming 
+                            families who share our commitment to environmental stewardship and sustainable agriculture.
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="text-center p-6 bg-white rounded-xl shadow-md">
+                            <div class="text-3xl font-bold text-primary-600 mb-2">150+</div>
+                            <div class="text-gray-600">Partner Farmers</div>
+                        </div>
+                        <div class="text-center p-6 bg-white rounded-xl shadow-md">
+                            <div class="text-3xl font-bold text-primary-600 mb-2">2,500+</div>
+                            <div class="text-gray-600">Hectares Farmed</div>
+                        </div>
+                        <div class="text-center p-6 bg-white rounded-xl shadow-md">
+                            <div class="text-3xl font-bold text-primary-600 mb-2">10,000+</div>
+                            <div class="text-gray-600">Happy Customers</div>
+                        </div>
+                        <div class="text-center p-6 bg-white rounded-xl shadow-md">
+                            <div class="text-3xl font-bold text-primary-600 mb-2">100%</div>
+                            <div class="text-gray-600">Organic Certified</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-leaf text-primary-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">100% Organic Certified</h4>
+                                <p class="text-gray-600 text-sm">All our products meet strict organic standards</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-handshake text-secondary-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Direct Trade Partnership</h4>
+                                <p class="text-gray-600 text-sm">Ensuring fair prices for our farming partners</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-accent-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-truck text-accent-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Carbon-Neutral Delivery</h4>
+                                <p class="text-gray-600 text-sm">Environmentally responsible logistics</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Images -->
+                <div class="relative animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            <img src="frontend/public/img/dorm.jpg" alt="Farm View" class="w-full h-48 object-cover rounded-xl shadow-lg" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZhcm0gVmlldzwvdGV4dD48L3N2Zz4=';">
+                            <img src="frontend/public/img/partners.jpg" alt="Farmers" class="w-full h-32 object-cover rounded-xl shadow-lg" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZhcm1lcnM8L3RleHQ+PC9zdmc+';">
+                        </div>
+                        <div class="space-y-4 pt-8">
+                            <img src="frontend/public/img/plaque.jpg" alt="Certification" class="w-full h-32 object-cover rounded-xl shadow-lg" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNlcnRpZmljYXRpb248L3RleHQ+PC9zdmc+';">
+                            <img src="frontend/public/img/vission-mission-objectives.jpg" alt="Mission" class="w-full h-48 object-cover rounded-xl shadow-lg" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk1pc3Npb248L3RleHQ+PC9zdmc+';">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-primary-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="text-white">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                        Join the Campo Vida Family
+                    </h2>
+                    <p class="text-xl text-primary-100 leading-relaxed mb-8">
+                        Experience the difference of truly fresh, organic produce while supporting 
+                        sustainable agriculture and local communities.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Visit Our Farm</h4>
+                                <p class="text-primary-100">Benguet, Philippines - Farm tours available</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-phone text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Call Us</h4>
+                                <p class="text-primary-100">+63 917 123 4567</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-envelope text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Email Us</h4>
+                                <p class="text-primary-100">hello@campovida.ph</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-8 shadow-xl">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Get Fresh Updates</h3>
+                    <form class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Your full name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="your@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                            <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Tell us how we can help you..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <img src="frontend/public/img/campo-vida-logo.jpeg" alt="Campo Vida Logo" class="w-10 h-10 object-cover rounded-full border-2 border-primary-200" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center" style="display: none;">
+                            <span class="text-white font-bold text-sm">CV</span>
+                        </div>
+                        <span class="text-xl font-bold">Campo Vida</span>
+                    </div>
+                    <p class="text-gray-400">
+                        Fresh, organic produce delivered from sustainable farms to your table.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="products.html" class="text-gray-400 hover:text-white transition-colors">Products</a></li>
+                        <li><a href="events.html" class="text-gray-400 hover:text-white transition-colors">Events</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-white transition-colors">About</a></li>
+                        <li><a href="contact.html" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-4">Products</h4>
+                    <ul class="space-y-2">
+                        <li><a href="products.html?category=vegetables" class="text-gray-400 hover:text-white transition-colors">Vegetables</a></li>
+                        <li><a href="products.html?category=fruits" class="text-gray-400 hover:text-white transition-colors">Fruits</a></li>
+                        <li><a href="products.html?category=herbs" class="text-gray-400 hover:text-white transition-colors">Herbs & Spices</a></li>
+                        <li><a href="products.html?category=dairy" class="text-gray-400 hover:text-white transition-colors">Dairy Products</a></li>
+                        <li><a href="products.html?category=seasonal" class="text-gray-400 hover:text-white transition-colors">Seasonal Boxes</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold mb-4">Contact Info</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Benguet, Philippines</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-phone"></i>
+                            <span>+63 917 123 4567</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-envelope"></i>
+                            <span>hello@campovida.ph</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Campo Vida. All rights reserved. | Made with ❤️ for sustainable agriculture.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="modalTitle" class="text-2xl font-bold text-gray-900"></h3>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <img id="modalImage" src="" alt="" class="w-full h-64 object-cover rounded-lg">
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span id="modalPrice" class="text-2xl font-bold text-primary-600"></span>
+                                <span class="text-gray-500">per kg</span>
+                            </div>
+                            <p id="modalDescription" class="text-gray-600"></p>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <label class="text-sm font-medium text-gray-700">Quantity (kg):</label>
+                                <div class="flex items-center space-x-2">
+                                    <button id="decreaseQty" class="p-1 border border-gray-300 rounded hover:bg-gray-50">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                        </svg>
+                                    </button>
+                                    <span id="quantity" class="px-3 py-1 border border-gray-300 rounded min-w-[50px] text-center">1</span>
+                                    <button id="increaseQty" class="p-1 border border-gray-300 rounded hover:bg-gray-50">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="text-lg font-semibold text-gray-900">
+                                Total: ₱<span id="totalPrice">0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- First Time Buyer Guidance -->
+                        <div id="buyerGuidance" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 hidden">
+                            <div class="flex items-start space-x-3">
+                                <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <h4 class="font-semibold text-yellow-800 mb-1">First Time Buyer Guidance</h4>
+                                    <p class="text-sm text-yellow-700 mb-2">
+                                        Welcome to Campo Vida! For your first purchase, you'll need to pay online. 
+                                        After 5 successful orders, you'll unlock Cash on Delivery (COD) option.
+                                    </p>
+                                    <div class="text-xs text-yellow-600">
+                                        <span id="orderProgress">Orders completed: 0/5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button id="buyNowBtn" class="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
+                                Buy Now
+                            </button>
+                            <button id="addToCartBtn" class="w-full border border-primary-600 text-primary-600 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Login</h3>
+                    <button id="closeLoginModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+                    </div>
+                    <button type="submit" class="w-full bg-primary-600 text-white py-2 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
+                        Login
+                    </button>
+                </form>
+                
+                <p class="text-center text-sm text-gray-600 mt-4">
+                    Don't have an account? <button id="showRegister" class="text-primary-600 hover:text-primary-700">Sign up</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Shopping Cart</h3>
+                    <button id="closeCartModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="cartItems" class="space-y-4 mb-6">
+                    <!-- Cart items will be populated by JavaScript -->
+                </div>
+                
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center text-xl font-bold mb-4">
+                        <span>Total: </span>
+                        <span id="cartTotal">₱0.00</span>
+                    </div>
+                    <button id="checkoutBtn" class="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span id="notificationText">Success!</span>
+        </div>
+    </div>
+
+    <script>
+        // Mock data that matches the real system structure
+        const products = [
+            // Vegetables
+            {
+                id: 1,
+                name: "Fresh Organic Tomatoes",
+                price: 85.00,
+                category: "vegetables",
+                image: "frontend/public/img/20250715_132607.jpg",
+                description: "Premium organic tomatoes grown in the fertile highlands of Benguet. Rich in lycopene and perfect for salads, cooking, and sauces.",
+                stock: 50,
+                unit: "kg",
+                farmer: "Benguet Farmers Collective"
+            },
+            {
+                id: 2,
+                name: "Organic Bell Peppers",
+                price: 120.00,
+                category: "vegetables",
+                image: "frontend/public/img/20250715_132621.jpg",
+                description: "Colorful bell peppers packed with vitamins C and A. Available in red, yellow, and green varieties.",
+                stock: 30,
+                unit: "kg",
+                farmer: "Highland Vegetable Farms"
+            },
+            {
+                id: 3,
+                name: "Fresh Lettuce",
+                price: 65.00,
+                category: "vegetables",
+                image: "frontend/public/img/20250715_132626.jpg",
+                description: "Crisp and fresh lettuce perfect for salads. Grown using sustainable farming practices.",
+                stock: 40,
+                unit: "kg",
+                farmer: "Green Valley Organics"
+            },
+            {
+                id: 4,
+                name: "Organic Carrots",
+                price: 90.00,
+                category: "vegetables",
+                image: "frontend/public/img/20250715_132634.jpg",
+                description: "Sweet and crunchy organic carrots. High in beta-carotene and perfect for snacking or cooking.",
+                stock: 60,
+                unit: "kg",
+                farmer: "Mountain Harvest Co."
+            },
+            {
+                id: 5,
+                name: "Fresh Cabbage",
+                price: 55.00,
+                category: "vegetables",
+                image: "frontend/public/img/20250715_133203.jpg",
+                description: "Fresh organic cabbage perfect for stir-fries, soups, and fermentation.",
+                stock: 35,
+                unit: "kg",
+                farmer: "Baguio Fresh Farms"
+            },
+            {
+                id: 6,
+                name: "Organic Broccoli",
+                price: 150.00,
+                category: "vegetables",
+                image: "frontend/public/img/20250715_133213.jpg",
+                description: "Nutrient-dense broccoli packed with vitamins and minerals. Perfect for healthy meals.",
+                stock: 25,
+                unit: "kg",
+                farmer: "Cordillera Organics"
+            },
+
+            // Fruits
+            {
+                id: 7,
+                name: "Fresh Strawberries",
+                price: 200.00,
+                category: "fruits",
+                image: "frontend/public/img/20250709_153424.jpg",
+                description: "Sweet and juicy strawberries from Baguio's cool mountain climate. Hand-picked at peak ripeness.",
+                stock: 20,
+                unit: "kg",
+                farmer: "Strawberry Hills Farm"
+            },
+            {
+                id: 8,
+                name: "Organic Bananas",
+                price: 75.00,
+                category: "fruits",
+                image: "frontend/public/img/20250709_153634.jpg",
+                description: "Fresh organic bananas, perfectly ripe and naturally sweet. Great source of potassium.",
+                stock: 80,
+                unit: "kg",
+                farmer: "Tropical Farms Collective"
+            },
+            {
+                id: 9,
+                name: "Fresh Apples",
+                price: 180.00,
+                category: "fruits",
+                image: "frontend/public/img/20250709_153946.jpg",
+                description: "Crisp and sweet apples from high-altitude orchards. Perfect for snacking or baking.",
+                stock: 45,
+                unit: "kg",
+                farmer: "Mountain Apple Orchards"
+            },
+            {
+                id: 10,
+                name: "Organic Pineapple",
+                price: 95.00,
+                category: "fruits",
+                image: "frontend/public/img/pineapple.jpg",
+                description: "Sweet and tangy organic pineapples. Rich in vitamin C and digestive enzymes.",
+                stock: 15,
+                unit: "piece",
+                farmer: "Tropical Paradise Farms"
+            },
+
+            // Herbs & Spices
+            {
+                id: 11,
+                name: "Fresh Basil",
+                price: 45.00,
+                category: "herbs",
+                image: "frontend/public/img/flower-1.jpg",
+                description: "Aromatic basil perfect for Italian dishes, pesto, and Thai cooking.",
+                stock: 25,
+                unit: "bundle",
+                farmer: "Herb Garden Collective"
+            },
+            {
+                id: 12,
+                name: "Organic Mint",
+                price: 40.00,
+                category: "herbs",
+                image: "frontend/public/img/flower-2.jpg",
+                description: "Fresh mint leaves perfect for teas, mojitos, and Middle Eastern cuisine.",
+                stock: 30,
+                unit: "bundle",
+                farmer: "Fresh Herb Co."
+            },
+            {
+                id: 13,
+                name: "Organic Rosemary",
+                price: 50.00,
+                category: "herbs",
+                image: "frontend/public/img/flower-3.jpg",
+                description: "Fragrant rosemary ideal for roasted meats, potatoes, and bread baking.",
+                stock: 20,
+                unit: "bundle",
+                farmer: "Mountain Herbs Farm"
+            },
+            {
+                id: 14,
+                name: "Fresh Cilantro",
+                price: 35.00,
+                category: "herbs",
+                image: "frontend/public/img/flower-4.jpg",
+                description: "Fresh cilantro leaves perfect for Mexican, Asian, and Indian dishes.",
+                stock: 40,
+                unit: "bundle",
+                farmer: "Garden Fresh Herbs"
+            },
+
+            // Dairy Products
+            {
+                id: 15,
+                name: "Farm Fresh Milk",
+                price: 85.00,
+                category: "dairy",
+                image: "frontend/public/img/20250709_153953.jpg",
+                description: "Fresh organic milk from grass-fed cows. Rich, creamy, and nutritious.",
+                stock: 20,
+                unit: "liter",
+                farmer: "Mountain Dairy Farm"
+            },
+            {
+                id: 16,
+                name: "Organic Cheese",
+                price: 350.00,
+                category: "dairy",
+                image: "frontend/public/img/20250709_153959.jpg",
+                description: "Artisanal organic cheese made from farm-fresh milk. Available in various flavors.",
+                stock: 12,
+                unit: "kg",
+                farmer: "Artisan Cheese Makers"
+            }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('campoVidaCart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('campoVidaWishlist')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('campoVidaUser')) || null;
+        let selectedProduct = null;
+        let userOrderCount = parseInt(localStorage.getItem('campoVidaOrderCount')) || 0;
+        let filteredProducts = [...products];
+        let currentPage = 1;
+        const productsPerPage = 8;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProducts();
+            setupEventListeners();
+            updateCartCount();
+            updateWishlistCount();
+            updateAuthState();
+        });
+
+        function setupEventListeners() {
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                const menu = document.getElementById('mobileMenu');
+                menu.classList.toggle('hidden');
+            });
+
+            // Search functionality
+            document.getElementById('productSearch').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filteredProducts = products.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.description.toLowerCase().includes(searchTerm) ||
+                    product.category.toLowerCase().includes(searchTerm)
+                );
+                currentPage = 1;
+                renderProducts();
+            });
+
+            // Sort functionality
+            document.getElementById('sortSelect').addEventListener('change', function(e) {
+                const sortType = e.target.value;
+                sortProducts(sortType);
+                renderProducts();
+            });
+
+            // Category filter
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    filterProducts(category);
+                    
+                    // Update active state
+                    document.querySelectorAll('.category-btn').forEach(b => {
+                        b.classList.remove('active', 'bg-primary-600', 'text-white');
+                        b.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    this.classList.add('active', 'bg-primary-600', 'text-white');
+                    this.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
+                    this.classList.add('bg-primary-600', 'text-white', 'border-primary-600');
+                });
+            });
+
+            // Navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Modal controls
+            document.getElementById('closeModal').addEventListener('click', closeProductModal);
+            document.getElementById('productModal').addEventListener('click', function(e) {
+                if (e.target === this) closeProductModal();
+            });
+
+            // Login modal
+            document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+            document.getElementById('mobileLoginBtn').addEventListener('click', openLoginModal);
+            document.getElementById('closeLoginModal').addEventListener('click', closeLoginModal);
+            document.getElementById('loginModal').addEventListener('click', function(e) {
+                if (e.target === this) closeLoginModal();
+            });
+
+            // Cart modal
+            document.getElementById('cartBtn').addEventListener('click', openCartModal);
+            document.getElementById('mobileCartBtn').addEventListener('click', openCartModal);
+            document.getElementById('closeCartModal').addEventListener('click', closeCartModal);
+            document.getElementById('cartModal').addEventListener('click', function(e) {
+                if (e.target === this) closeCartModal();
+            });
+
+            // Product modal quantity controls
+            document.getElementById('decreaseQty').addEventListener('click', function() {
+                const qtyEl = document.getElementById('quantity');
+                let qty = parseInt(qtyEl.textContent);
+                if (qty > 1) {
+                    qty--;
+                    qtyEl.textContent = qty;
+                    updateTotalPrice();
+                }
+            });
+
+            document.getElementById('increaseQty').addEventListener('click', function() {
+                const qtyEl = document.getElementById('quantity');
+                let qty = parseInt(qtyEl.textContent);
+                qty++;
+                qtyEl.textContent = qty;
+                updateTotalPrice();
+            });
+
+            // Buy now and add to cart
+            document.getElementById('buyNowBtn').addEventListener('click', buyNow);
+            document.getElementById('addToCartBtn').addEventListener('click', addToCart);
+
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                simulateLogin();
+            });
+
+            // Checkout button
+            document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
+
+            // Hero image change
+            window.changeHeroImage = changeHeroImage;
+        }
+
+        // Hero image functionality
+        function changeHeroImage(imageSrc) {
+            document.getElementById('heroMainImage').src = imageSrc;
+            
+            // Update thumbnail active state
+            document.querySelectorAll('.hero-thumb').forEach(thumb => {
+                thumb.classList.remove('active');
+                thumb.classList.replace('border-white', 'border-white/50');
+            });
+            
+            event.target.closest('.hero-thumb').classList.add('active');
+            event.target.closest('.hero-thumb').classList.replace('border-white/50', 'border-white');
+        }
+
+        // Product filtering and sorting
+        function filterProducts(category) {
+            if (category === 'all') {
+                filteredProducts = [...products];
+            } else {
+                filteredProducts = products.filter(product => product.category === category);
+            }
+            currentPage = 1;
+            renderProducts();
+        }
+
+        function sortProducts(sortType) {
+            switch (sortType) {
+                case 'name':
+                    filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'price-low':
+                    filteredProducts.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    filteredProducts.sort((a, b) => b.price - a.price);
+                    break;
+                case 'category':
+                    filteredProducts.sort((a, b) => a.category.localeCompare(b.category));
+                    break;
+            }
+        }
+
+        // Render products
+        function renderProducts() {
+            const container = document.getElementById('productsGrid');
+            const loadingState = document.getElementById('loadingState');
+            const noProductsFound = document.getElementById('noProductsFound');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+            // Show loading
+            loadingState.classList.remove('hidden');
+            container.innerHTML = '';
+            noProductsFound.classList.add('hidden');
+
+            setTimeout(() => {
+                loadingState.classList.add('hidden');
+
+                if (filteredProducts.length === 0) {
+                    noProductsFound.classList.remove('hidden');
+                    loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+
+                const startIndex = (currentPage - 1) * productsPerPage;
+                const endIndex = startIndex + productsPerPage;
+                const productsToShow = filteredProducts.slice(0, endIndex);
+
+                container.innerHTML = productsToShow.map(product => `
+                    <div class="product-card bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 animate-fade-in">
+                        <div class="relative overflow-hidden">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" 
+                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPiR7cHJvZHVjdC5uYW1lfTwvdGV4dD48L3N2Zz4=';">
+                            <div class="absolute top-3 left-3">
+                                <span class="bg-primary-600 text-white text-xs px-2 py-1 rounded-full font-medium">${product.category}</span>
+                            </div>
+                            <div class="absolute top-3 right-3">
+                                <button onclick="toggleWishlist(${product.id})" class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors">
+                                    <i class="fas fa-heart text-gray-400 hover:text-red-500 transition-colors"></i>
+                                </button>
+                            </div>
+                            ${product.stock < 10 ? '<div class="absolute bottom-3 left-3"><span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">Low Stock</span></div>' : ''}
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">${product.name}</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">${product.description}</p>
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-2xl font-bold text-primary-600">₱${product.price.toFixed(2)}</span>
+                                    <span class="text-gray-500 text-sm">/${product.unit}</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm text-gray-500">Stock: ${product.stock}</div>
+                                    <div class="text-xs text-gray-400">${product.farmer}</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openProductModal(${product.id})" class="flex-1 bg-primary-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+                                    <i class="fas fa-eye mr-2"></i>View Details
+                                </button>
+                                <button onclick="quickAddToCart(${product.id})" class="px-4 py-2 border-2 border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Show/hide load more button
+                if (endIndex < filteredProducts.length) {
+                    loadMoreBtn.classList.remove('hidden');
+                    loadMoreBtn.onclick = () => {
+                        currentPage++;
+                        renderProducts();
+                    };
+                } else {
+                    loadMoreBtn.classList.add('hidden');
+                }
+            }, 500);
+        }
+
+        // Product modal functions
+        function openProductModal(productId) {
+            selectedProduct = products.find(p => p.id === productId);
+            if (!selectedProduct) return;
+
+            document.getElementById('modalTitle').textContent = selectedProduct.name;
+            document.getElementById('modalImage').src = selectedProduct.image;
+            document.getElementById('modalImage').alt = selectedProduct.name;
+            document.getElementById('modalPrice').textContent = `₱${selectedProduct.price.toFixed(2)}`;
+            document.getElementById('modalDescription').textContent = selectedProduct.description;
+            document.getElementById('quantity').textContent = '1';
+            
+            updateTotalPrice();
+            updateBuyerGuidance();
+            
+            document.getElementById('productModal').classList.add('show');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('show');
+            selectedProduct = null;
+        }
+
+        function updateTotalPrice() {
+            if (!selectedProduct) return;
+            const qty = parseInt(document.getElementById('quantity').textContent);
+            const total = selectedProduct.price * qty;
+            document.getElementById('totalPrice').textContent = total.toFixed(2);
+        }
+
+        function updateBuyerGuidance() {
+            const guidanceEl = document.getElementById('buyerGuidance');
+            const progressEl = document.getElementById('orderProgress');
+            
+            if (userOrderCount < 5) {
+                guidanceEl.classList.remove('hidden');
+                progressEl.textContent = `Orders completed: ${userOrderCount}/5`;
+            } else {
+                guidanceEl.classList.add('hidden');
+            }
+        }
+
+        // Cart functions
+        function quickAddToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1
+                });
+            }
+
+            updateCartCount();
+            saveCart();
+            showNotification(`Added ${product.name} to cart`);
+        }
+
+        function addToCart() {
+            if (!selectedProduct) return;
+
+            const qty = parseInt(document.getElementById('quantity').textContent);
+            const existingItem = cart.find(item => item.id === selectedProduct.id);
+            
+            if (existingItem) {
+                existingItem.quantity += qty;
+            } else {
+                cart.push({
+                    id: selectedProduct.id,
+                    name: selectedProduct.name,
+                    price: selectedProduct.price,
+                    image: selectedProduct.image,
+                    quantity: qty
+                });
+            }
+
+            updateCartCount();
+            saveCart();
+            closeProductModal();
+            showNotification(`Added ${qty} ${selectedProduct.unit} of ${selectedProduct.name} to cart`);
+        }
+
+        function buyNow() {
+            if (!selectedProduct) return;
+            
+            addToCart();
+            openCartModal();
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            // Desktop cart count
+            const countEl = document.getElementById('cartCount');
+            countEl.textContent = count;
+            if (count > 0) {
+                countEl.classList.remove('opacity-0', 'scale-0');
+                countEl.classList.add('opacity-100', 'scale-100');
+            } else {
+                countEl.classList.add('opacity-0', 'scale-0');
+                countEl.classList.remove('opacity-100', 'scale-100');
+            }
+            
+            // Mobile cart count
+            const mobileCountEl = document.getElementById('mobileCartCount');
+            mobileCountEl.textContent = count;
+            if (count > 0) {
+                mobileCountEl.classList.remove('opacity-0');
+            } else {
+                mobileCountEl.classList.add('opacity-0');
+            }
+        }
+
+        function updateWishlistCount() {
+            const count = wishlist.length;
+            const countEl = document.getElementById('wishlistCount');
+            countEl.textContent = count;
+            if (count > 0) {
+                countEl.classList.remove('opacity-0', 'scale-0');
+                countEl.classList.add('opacity-100', 'scale-100');
+            } else {
+                countEl.classList.add('opacity-0', 'scale-0');
+                countEl.classList.remove('opacity-100', 'scale-100');
+            }
+        }
+
+        function toggleWishlist(productId) {
+            const index = wishlist.indexOf(productId);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+                showNotification('Removed from wishlist');
+            } else {
+                wishlist.push(productId);
+                showNotification('Added to wishlist');
+            }
+            updateWishlistCount();
+            saveWishlist();
+        }
+
+        function openCartModal() {
+            renderCartItems();
+            document.getElementById('cartModal').classList.add('show');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cartModal').classList.remove('show');
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cartItems');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="text-6xl text-gray-300 mb-4">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Your cart is empty</h3>
+                        <p class="text-gray-500">Add some fresh products to get started!</p>
+                    </div>
+                `;
+                document.getElementById('cartTotal').textContent = '₱0.00';
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-4">
+                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg" 
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM2YjcyODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZTwvdGV4dD48L3N2Zz4=';">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-900">${item.name}</h4>
+                        <p class="text-gray-600 text-sm">₱${item.price.toFixed(2)} × ${item.quantity}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-gray-900">₱${(item.price * item.quantity).toFixed(2)}</p>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-500 text-sm hover:text-red-700 transition-colors">
+                            <i class="fas fa-trash mr-1"></i>Remove
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('cartTotal').textContent = `₱${total.toFixed(2)}`;
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartCount();
+            renderCartItems();
+            saveCart();
+            showNotification('Item removed from cart');
+        }
+
+        // Authentication functions
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+        }
+
+        function simulateLogin() {
+            const email = document.querySelector('#loginForm input[type="email"]').value;
+            const password = document.querySelector('#loginForm input[type="password"]').value;
+            
+            if (email && password) {
+                currentUser = { 
+                    name: email.split('@')[0], 
+                    email: email,
+                    orders: userOrderCount 
+                };
+                localStorage.setItem('campoVidaUser', JSON.stringify(currentUser));
+                updateAuthState();
+                closeLoginModal();
+                showNotification(`Welcome back, ${currentUser.name}!`);
+            }
+        }
+
+        function updateAuthState() {
+            const loginBtn = document.getElementById('loginBtn');
+            const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+            
+            if (currentUser) {
+                loginBtn.innerHTML = `<i class="fas fa-user-circle mr-1"></i>${currentUser.name}`;
+                mobileLoginBtn.textContent = currentUser.name;
+            } else {
+                loginBtn.innerHTML = '<i class="fas fa-user"></i>';
+                mobileLoginBtn.textContent = 'Login';
+            }
+        }
+
+        // Checkout function
+        function handleCheckout() {
+            if (cart.length === 0) {
+                showNotification('Your cart is empty');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            if (userOrderCount < 5) {
+                if (confirm(`Total: ₱${total.toFixed(2)}\n\nNote: Online payment required for ${userOrderCount < 1 ? 'first-time' : 'new'} buyers (${userOrderCount}/5 orders completed). Continue to payment?`)) {
+                    processOrder('online');
+                }
+            } else {
+                const paymentMethod = confirm(`Total: ₱${total.toFixed(2)}\n\nChoose payment method:\nOK = Online Payment\nCancel = Cash on Delivery`);
+                processOrder(paymentMethod ? 'online' : 'cod');
+            }
+        }
+
+        function processOrder(paymentMethod) {
+            userOrderCount++;
+            localStorage.setItem('campoVidaOrderCount', userOrderCount.toString());
+            
+            cart = [];
+            updateCartCount();
+            saveCart();
+            closeCartModal();
+            
+            const paymentText = paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment';
+            showNotification(`Order placed successfully! Payment method: ${paymentText}`);
+        }
+
+        // Storage functions
+        function saveCart() {
+            localStorage.setItem('campoVidaCart', JSON.stringify(cart));
+        }
+
+        function saveWishlist() {
+            localStorage.setItem('campoVidaWishlist', JSON.stringify(wishlist));
+        }
+
+        // Notification function
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            document.getElementById('notificationText').textContent = message;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+
+        function renderProducts(productsToRender = products) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            productsToRender.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer';
+                productCard.onclick = () => openProductModal(product);
+
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">${product.name}</h3>
+                        <div class="flex items-center justify-between">
+                            <span class="text-lg font-bold text-primary-600">₱${product.price.toFixed(2)}</span>
+                            <span class="text-sm text-gray-500">per kg</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">${product.description.substring(0, 50)}...</p>
+                    </div>
+                `;
+
+                grid.appendChild(productCard);
+            });
+        }
+
+        function filterProducts(category) {
+            if (category === 'all') {
+                renderProducts();
+            } else {
+                const filtered = products.filter(p => p.category === category);
+                renderProducts(filtered);
+            }
+        }
+
+        function openProductModal(product) {
+            selectedProduct = product;
+            document.getElementById('modalTitle').textContent = product.name;
+            document.getElementById('modalImage').src = product.image;
+            document.getElementById('modalImage').alt = product.name;
+            document.getElementById('modalPrice').textContent = `₱${product.price.toFixed(2)}`;
+            document.getElementById('modalDescription').textContent = product.description;
+            document.getElementById('quantity').textContent = '1';
+            updateTotalPrice();
+            updateBuyerGuidance();
+            document.getElementById('productModal').classList.add('show');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('show');
+            selectedProduct = null;
+        }
+
+        function updateTotalPrice() {
+            if (!selectedProduct) return;
+            const qty = parseInt(document.getElementById('quantity').textContent);
+            const total = selectedProduct.price * qty;
+            document.getElementById('totalPrice').textContent = total.toFixed(2);
+        }
+
+        function updateBuyerGuidance() {
+            const guidance = document.getElementById('buyerGuidance');
+            const orderProgress = document.getElementById('orderProgress');
+            
+            if (!currentUser) {
+                guidance.classList.add('hidden');
+                return;
+            }
+
+            if (userOrderCount < 5) {
+                guidance.classList.remove('hidden');
+                orderProgress.textContent = `Orders completed: ${userOrderCount}/5`;
+                
+                if (userOrderCount === 0) {
+                    guidance.querySelector('p').textContent = 
+                        'Welcome to Campo Vida! For your first purchase, you\'ll need to pay online. After 5 successful orders, you\'ll unlock Cash on Delivery (COD) option.';
+                } else {
+                    guidance.querySelector('p').textContent = 
+                        `You've completed ${userOrderCount}/5 orders. ${5 - userOrderCount} more orders to unlock COD option.`;
+                }
+            } else {
+                guidance.classList.add('hidden');
+            }
+        }
+
+        function buyNow() {
+            if (!currentUser) {
+                openLoginModal();
+                return;
+            }
+
+            if (!selectedProduct) return;
+
+            const qty = parseInt(document.getElementById('quantity').textContent);
+            
+            // Show guidance for first-time buyers
+            if (userOrderCount === 0) {
+                if (confirm('Welcome to Campo Vida! For your first purchase, you\'ll need to pay online. After 5 successful orders, you\'ll unlock Cash on Delivery (COD) option. Continue to purchase?')) {
+                    processPurchase(qty);
+                }
+            } else if (userOrderCount < 5) {
+                if (confirm(`You've completed ${userOrderCount}/5 orders. ${5 - userOrderCount} more orders to unlock COD option. Continue to purchase?`)) {
+                    processPurchase(qty);
+                }
+            } else {
+                processPurchase(qty);
+            }
+        }
+
+        function processPurchase(qty) {
+            // Simulate purchase
+            userOrderCount++;
+            closeProductModal();
+            showNotification(`Purchase successful! You bought ${qty} kg of ${selectedProduct.name}`);
+            updateBuyerGuidance();
+        }
+
+        function addToCart() {
+            if (!currentUser) {
+                openLoginModal();
+                return;
+            }
+
+            if (!selectedProduct) return;
+
+            const qty = parseInt(document.getElementById('quantity').textContent);
+            const existingItem = cart.find(item => item.id === selectedProduct.id);
+
+            if (existingItem) {
+                existingItem.quantity += qty;
+            } else {
+                cart.push({
+                    ...selectedProduct,
+                    quantity: qty
+                });
+            }
+
+            updateCartCount();
+            closeProductModal();
+            showNotification(`Added ${qty} kg of ${selectedProduct.name} to cart`);
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const countEl = document.getElementById('cartCount');
+            countEl.textContent = count;
+            countEl.classList.toggle('show', count > 0);
+        }
+
+        function openCartModal() {
+            renderCartItems();
+            document.getElementById('cartModal').classList.add('show');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cartModal').classList.remove('show');
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cartItems');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Your cart is empty</p>';
+                document.getElementById('cartTotal').textContent = '₱0.00';
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="flex items-center space-x-4 border-b pb-4">
+                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded">
+                    <div class="flex-1">
+                        <h4 class="font-semibold">${item.name}</h4>
+                        <p class="text-gray-600">₱${item.price.toFixed(2)} × ${item.quantity} kg</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold">₱${(item.price * item.quantity).toFixed(2)}</p>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-500 text-sm hover:text-red-700">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('cartTotal').textContent = `₱${total.toFixed(2)}`;
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartCount();
+            renderCartItems();
+            showNotification('Item removed from cart');
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            document.getElementById('notificationText').textContent = message;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Checkout functionality
+        document.getElementById('checkoutBtn').addEventListener('click', function() {
+            if (cart.length === 0) {
+                showNotification('Your cart is empty');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            if (userOrderCount < 5) {
+                if (confirm(`Total: ₱${total.toFixed(2)}\n\nNote: Online payment required for ${userOrderCount < 1 ? 'first-time' : 'new'} buyers. Continue to payment?`)) {
+                    // Simulate checkout
+                    userOrderCount++;
+                    cart = [];
+                    updateCartCount();
+                    closeCartModal();
+                    showNotification('Order placed successfully! Payment processed online.');
+                }
+            } else {
+                const paymentMethod = confirm(`Total: ₱${total.toFixed(2)}\n\nChoose payment method:\nOK = Online Payment\nCancel = Cash on Delivery`);
+                userOrderCount++;
+                cart = [];
+                updateCartCount();
+                closeCartModal();
+                showNotification(`Order placed successfully! Payment method: ${paymentMethod ? 'Online' : 'Cash on Delivery'}`);
+            }
+        });
+    </script>
+</body>
+</html>
